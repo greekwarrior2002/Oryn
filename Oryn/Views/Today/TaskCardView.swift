@@ -2,6 +2,8 @@ import SwiftUI
 
 struct TaskCardView: View {
     @EnvironmentObject var store: TaskStore
+    @EnvironmentObject var insightsStore: InsightsStore
+    @EnvironmentObject var healthKit: HealthKitManager
     let task: OrynTask
 
     @State private var isCompleting = false
@@ -78,7 +80,7 @@ struct TaskCardView: View {
         withAnimation(.orynBounce) { isCompleting = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             store.completeTask(task)
-            // isCompleting resets automatically since the view is removed from the list
+            insightsStore.recordCompletion(task: task, readiness: healthKit.readiness)
         }
     }
 }

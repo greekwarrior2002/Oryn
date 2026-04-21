@@ -2,13 +2,14 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var store: TaskStore
+    @EnvironmentObject var insightsStore: InsightsStore
     @State private var selectedTab: Tab = .today
     @State private var showAddTask = false
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @AppStorage("dailyCapHours") private var dailyCapHours: Double = 4.0
 
     enum Tab: Int, Hashable {
-        case today, week, settings
+        case today, week, insights, settings
     }
 
     init() {
@@ -24,6 +25,9 @@ struct ContentView: View {
 
                 WeekView(showAddTask: $showAddTask)
                     .tag(Tab.week)
+
+                InsightsView()
+                    .tag(Tab.insights)
 
                 SettingsView()
                     .tag(Tab.settings)
@@ -64,10 +68,11 @@ private struct CustomTabBar: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            tabItem(.today, icon: "sun.max.fill", label: "Today")
-            tabItem(.week, icon: "calendar", label: "Week")
+            tabItem(.today,    icon: "sun.max.fill",   label: "Today")
+            tabItem(.week,     icon: "calendar",        label: "Week")
             addButton
-            tabItem(.settings, icon: "gearshape.fill", label: "Settings")
+            tabItem(.insights, icon: "chart.bar.fill",  label: "Insights")
+            tabItem(.settings, icon: "gearshape.fill",  label: "Settings")
         }
         .padding(.horizontal, Spacing.lg)
         .padding(.top, Spacing.sm)

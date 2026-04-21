@@ -41,6 +41,10 @@
 		CCCCCCCCCCCCCCCCCCCCCC20 /* EnergyPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB22 /* EnergyPickerView.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCC21 /* ReadinessCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB23 /* ReadinessCardView.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCC22 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB24 /* HealthKit.framework */; };
+		CCCCCCCCCCCCCCCCCCCCCC23 /* ProductivityRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB25 /* ProductivityRecord.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC24 /* InsightsEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB26 /* InsightsEngine.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC25 /* InsightsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB27 /* InsightsStore.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC26 /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB28 /* InsightsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,6 +84,10 @@
 		BBBBBBBBBBBBBBBBBBBBBB22 /* EnergyPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnergyPickerView.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBB23 /* ReadinessCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadinessCardView.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBB24 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		BBBBBBBBBBBBBBBBBBBBBB25 /* ProductivityRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductivityRecord.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB26 /* InsightsEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsEngine.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB27 /* InsightsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsStore.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB28 /* InsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +126,7 @@
 				DDDDDDDDDDDDDDDDDDDDDD04 /* Models */,
 				DDDDDDDDDDDDDDDDDDDDDD05 /* Scheduling */,
 				DDDDDDDDDDDDDDDDDDDDDD06 /* Store */,
+				DDDDDDDDDDDDDDDDDDDDDD11 /* Insights */,
 				DDDDDDDDDDDDDDDDDDDDDD07 /* Theme */,
 				DDDDDDDDDDDDDDDDDDDDDD08 /* Utilities */,
 				DDDDDDDDDDDDDDDDDDDDDD09 /* Components */,
@@ -137,6 +146,7 @@
 				BBBBBBBBBBBBBBBBBBBBBB04 /* ScheduleDay.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB1E /* EnergyLevel.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB1F /* OrynMigrationPlan.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB25 /* ProductivityRecord.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -193,6 +203,7 @@
 				DDDDDDDDDDDDDDDDDDDDDD0C /* AddTask */,
 				DDDDDDDDDDDDDDDDDDDDDD0D /* Week */,
 				DDDDDDDDDDDDDDDDDDDDDD0E /* Settings */,
+				DDDDDDDDDDDDDDDDDDDDDD12 /* Insights */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -253,6 +264,23 @@
 				BBBBBBBBBBBBBBBBBBBBBB1B /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD11 /* Insights */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB26 /* InsightsEngine.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB27 /* InsightsStore.swift */,
+			);
+			path = Insights;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD12 /* Insights */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB28 /* InsightsView.swift */,
+			);
+			path = Insights;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -356,6 +384,10 @@
 				CCCCCCCCCCCCCCCCCCCCCC1F /* HealthKitManager.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCC20 /* EnergyPickerView.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCC21 /* ReadinessCardView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC23 /* ProductivityRecord.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC24 /* InsightsEngine.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC25 /* InsightsStore.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC26 /* InsightsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
