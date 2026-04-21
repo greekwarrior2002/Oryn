@@ -1,13 +1,14 @@
 import AppIntents
 
 struct OrynShortcuts: AppShortcutsProvider {
+    @AppShortcutsBuilder
     static var appShortcuts: [AppShortcut] {
         AppShortcut(
             intent: AddTaskIntent(),
             phrases: [
-                "Add \(\.$taskTitle) to \(.applicationName)",
-                "Add task \(\.$taskTitle) in \(.applicationName)",
-                "Create task \(\.$taskTitle) in \(.applicationName)"
+                "Add a task in \(.applicationName)",
+                "New task in \(.applicationName)",
+                "Create a task in \(.applicationName)"
             ],
             shortTitle: "Add Task",
             systemImageName: "plus.circle.fill"
@@ -25,9 +26,9 @@ struct OrynShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: MarkTaskDoneIntent(),
             phrases: [
-                "Mark \(\.$taskName) as done in \(.applicationName)",
-                "Complete \(\.$taskName) in \(.applicationName)",
-                "Finish \(\.$taskName) in \(.applicationName)"
+                "Mark a task done in \(.applicationName)",
+                "Complete a task in \(.applicationName)",
+                "Finish a task in \(.applicationName)"
             ],
             shortTitle: "Mark Done",
             systemImageName: "checkmark.circle.fill"
