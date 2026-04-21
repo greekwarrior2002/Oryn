@@ -4,8 +4,8 @@ import Foundation
 struct ParsedTask: Identifiable {
     let id = UUID()
     var title: String
-    var deadline: Date?
-    var deadlineLabel: String?   // human-readable hint shown in preview ("Friday", "Tomorrow")
+    var deadline: Date? = nil
+    var deadlineLabel: String? = nil   // human-readable hint shown in preview ("Friday", "Tomorrow")
     var durationMinutes: Int
     var priority: Priority
     var isSelected: Bool = true
