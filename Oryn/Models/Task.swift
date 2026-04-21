@@ -8,6 +8,7 @@ final class OrynTask {
     var deadline: Date
     var durationMinutes: Int
     var priorityRaw: Int
+    var energyLevelRaw: Int
     var scheduledDate: Date?
     var isCompleted: Bool
     var completedAt: Date?
@@ -16,6 +17,11 @@ final class OrynTask {
     var priority: Priority {
         get { Priority(rawValue: priorityRaw) ?? .medium }
         set { priorityRaw = newValue.rawValue }
+    }
+
+    var energyLevel: EnergyLevel {
+        get { EnergyLevel(rawValue: energyLevelRaw) ?? .medium }
+        set { energyLevelRaw = newValue.rawValue }
     }
 
     var isOverdue: Bool {
@@ -32,12 +38,13 @@ final class OrynTask {
         durationMinutes >= 60 ? "\(durationMinutes / 60)h" : "\(durationMinutes)m"
     }
 
-    init(title: String, deadline: Date, durationMinutes: Int, priority: Priority) {
+    init(title: String, deadline: Date, durationMinutes: Int, priority: Priority, energyLevel: EnergyLevel = .medium) {
         self.id = UUID()
         self.title = title
         self.deadline = deadline
         self.durationMinutes = durationMinutes
         self.priorityRaw = priority.rawValue
+        self.energyLevelRaw = energyLevel.rawValue
         self.isCompleted = false
         self.createdAt = Date()
     }
