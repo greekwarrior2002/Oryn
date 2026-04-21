@@ -1,0 +1,46 @@
+import AppIntents
+
+struct OrynShortcuts: AppShortcutsProvider {
+    static var appShortcuts: [AppShortcut] {
+        AppShortcut(
+            intent: AddTaskIntent(),
+            phrases: [
+                "Add \(\.$taskTitle) to \(.applicationName)",
+                "Add task \(\.$taskTitle) in \(.applicationName)",
+                "Create task \(\.$taskTitle) in \(.applicationName)"
+            ],
+            shortTitle: "Add Task",
+            systemImageName: "plus.circle.fill"
+        )
+        AppShortcut(
+            intent: TodayPlanIntent(),
+            phrases: [
+                "What's my plan today in \(.applicationName)",
+                "What do I have today in \(.applicationName)",
+                "Show today's tasks in \(.applicationName)"
+            ],
+            shortTitle: "Today's Plan",
+            systemImageName: "sun.max.fill"
+        )
+        AppShortcut(
+            intent: MarkTaskDoneIntent(),
+            phrases: [
+                "Mark \(\.$taskName) as done in \(.applicationName)",
+                "Complete \(\.$taskName) in \(.applicationName)",
+                "Finish \(\.$taskName) in \(.applicationName)"
+            ],
+            shortTitle: "Mark Done",
+            systemImageName: "checkmark.circle.fill"
+        )
+        AppShortcut(
+            intent: EasierDayIntent(),
+            phrases: [
+                "Give me an easier day in \(.applicationName)",
+                "Too busy today in \(.applicationName)",
+                "Lighten my schedule in \(.applicationName)"
+            ],
+            shortTitle: "Easier Day",
+            systemImageName: "arrow.down.circle.fill"
+        )
+    }
+}
