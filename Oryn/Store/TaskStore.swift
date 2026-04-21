@@ -78,6 +78,8 @@ final class TaskStore: ObservableObject {
         let task = OrynTask(title: title, deadline: deadline, durationMinutes: durationMinutes,
                             priority: priority, energyLevel: resolved)
         context.insert(task)
+        // Single fetch loads the new task into memory so SchedulerEngine can assign it a date;
+        // save persists the scheduled dates, then one more fetch refreshes the published array.
         fetchTasks()
         SchedulerEngine.redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
         save()

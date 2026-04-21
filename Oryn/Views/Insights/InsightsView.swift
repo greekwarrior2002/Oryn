@@ -11,11 +11,7 @@ struct InsightsView: View {
 
                 statsRow
 
-                if insightsStore.hasEnoughData && !insightsStore.insights.isEmpty {
-                    insightCards
-                } else {
-                    emptyState
-                }
+                content
             }
             .padding(.horizontal, Spacing.md)
             .padding(.bottom, 120)
@@ -43,6 +39,27 @@ struct InsightsView: View {
         }
     }
 
+    // MARK: - Content routing
+
+    @ViewBuilder
+    private var content: some View {
+        if insightsStore.hasEnoughData {
+            if insightsStore.isGeneratingAI {
+                aiLoadingCard
+            } else if !insightsStore.insights.isEmpty {
+                insightCards
+                if let err = insightsStore.aiError {
+                    aiErrorNote(err)
+                }
+            } else {
+                // Has enough records but no patterns surfaced yet — analysing
+                analyzingCard
+            }
+        } else {
+            emptyState
+        }
+    }
+
     // MARK: - Insight Cards
 
     private var insightCards: some View {
@@ -53,7 +70,59 @@ struct InsightsView: View {
         }
     }
 
-    // MARK: - Empty State
+    // MARK: - AI Loading
+
+    private var aiLoadingCard: some View {
+        HStack(spacing: Spacing.md) {
+            ProgressView()
+                .tint(.orynAccent)
+            Text("Analysing your patterns…")
+                .orynFont(.orynSubheadline, color: .orynTextSecondary)
+            Spacer()
+        }
+        .padding(Spacing.lg)
+        .background(
+            RoundedRectangle(cornerRadius: Radius.lg)
+                .fill(Color.orynSurface)
+                .orynCardShadow()
+        )
+    }
+
+    private func aiErrorNote(_ message: String) -> some View {
+        Text("Note: \(message)")
+            .orynFont(.orynCaption, color: .orynTextTertiary)
+            .padding(.horizontal, Spacing.xs)
+    }
+
+    // MARK: - Analysing state (enough data, no insights fired yet)
+
+    private var analyzingCard: some View {
+        VStack(alignment: .leading, spacing: Spacing.md) {
+            HStack {
+                Image(systemName: "waveform.path.ecg")
+                    .font(.system(size: 26, weight: .medium))
+                    .foregroundColor(.orynAccent)
+                Spacer()
+                Text("\(insightsStore.totalCompletions) tasks logged")
+                    .orynFont(.orynCaption, color: .orynTextSecondary)
+            }
+
+            Text("Patterns forming")
+                .orynFont(.orynTitle2)
+
+            Text("You have enough data, but distinct patterns haven't emerged yet. Complete tasks at different times of day or across multiple days to surface insights.")
+                .orynFont(.orynSubheadline, color: .orynTextSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(Spacing.lg)
+        .background(
+            RoundedRectangle(cornerRadius: Radius.lg)
+                .fill(Color.orynSurface)
+                .orynCardShadow()
+        )
+    }
+
+    // MARK: - Empty State (< minimumCompletions)
 
     private var emptyState: some View {
         VStack(spacing: Spacing.lg) {

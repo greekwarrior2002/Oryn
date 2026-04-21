@@ -13,14 +13,16 @@ struct WeekDaySection: View {
                 withAnimation(.orynSpring) { isExpanded.toggle() }
             } label: {
                 HStack(alignment: .center, spacing: Spacing.md) {
-                    // Date column
+                    // Date column — "Today" uses a smaller font to fit the fixed-width column
                     VStack(alignment: .leading, spacing: 2) {
                         Text(day.shortDayName.uppercased())
                             .orynFont(.orynCaption, color: day.isToday ? .orynAccent : .orynTextTertiary)
                             .tracking(1.5)
                         Text(day.isToday ? "Today" : day.dayNumber)
-                            .font(.system(size: 26, weight: day.isToday ? .bold : .regular))
+                            .font(.system(size: day.isToday ? 17 : 26,
+                                          weight: day.isToday ? .bold : .regular))
                             .foregroundColor(day.isToday ? .orynTextPrimary : .orynTextSecondary)
+                            .lineLimit(1)
                     }
                     .frame(width: 52, alignment: .leading)
 

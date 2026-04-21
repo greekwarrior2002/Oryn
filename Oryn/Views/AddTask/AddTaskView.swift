@@ -25,6 +25,7 @@ struct AddTaskView: View {
                             .focused($titleFocused)
                             .lineLimit(1...4)
                             .submitLabel(.done)
+                            .onSubmit { submitTask() }
                             .onChange(of: title) { _, newTitle in
                                 if showValidationError && !newTitle.isEmpty {
                                     withAnimation(.orynSmooth) { showValidationError = false }
@@ -131,6 +132,15 @@ struct AddTaskView: View {
                         dismiss()
                     }
                     .foregroundColor(.orynTextSecondary)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Add") {
+                        submitTask()
+                    }
+                    .fontWeight(.semibold)
+                    .foregroundColor(title.trimmingCharacters(in: .whitespaces).isEmpty ? .orynTextTertiary : .orynAccent)
+                    .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .animation(.orynSmooth, value: title.isEmpty)
                 }
             }
         }

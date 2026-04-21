@@ -26,10 +26,65 @@ struct ChartBar: Identifiable {
 // MARK: - Engine
 
 enum InsightsEngine {
-    static let minimumCompletions = 5
+
+    // Minimum completions before any insight is generated.
+    // Lowered to 3 so first insights surface quickly.
+    static let minimumCompletions = 3
 
     static func canGenerateInsights(from records: [ProductivityRecord]) -> Bool {
         records.count >= minimumCompletions
+    }
+
+    // Build a productivity summary used by both the local engine and AI service
+    static func buildSummary(from records: [ProductivityRecord]) -> ProductivitySummary {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+
+        // Peak hour
+        var blockCounts = [Int: Int]()
+        for r in records { blockCounts[r.completionHour, default: 0] += 1 }
+        let peakHour = blockCounts.max(by: { $0.value < $1.value })?.key
+
+        // On-time rate
+        let onTimeRate = records.isEmpty ? 0 :
+            Int(Double(records.filter { $0.wasOnTime }.count) / Double(records.count) * 100)
+
+        // Streak
+        let sortedDays = Set(records.map { cal.startOfDay(for: $0.completedAt) }).sorted(by: >)
+        var streak = 0
+        var cursor = today
+        for day in sortedDays {
+            if cal.isDate(day, inSameDayAs: cursor) {
+                streak += 1
+                cursor = cal.date(byAdding: .day, value: -1, to: cursor)!
+            } else if day < cursor { break }
+        }
+
+        // Sleep
+        let sleepRecords = records.filter { $0.sleepHours > 0 }
+        let avgSleep = sleepRecords.isEmpty ? 0.0 :
+            sleepRecords.reduce(0.0) { $0 + $1.sleepHours } / Double(sleepRecords.count)
+
+        // Evening %
+        let eveningCount = records.filter { $0.completionHour >= 20 }.count
+        let eveningPct = records.isEmpty ? 0 : Int(Double(eveningCount) / Double(records.count) * 100)
+
+        let daysTracked = Set(records.map { cal.startOfDay(for: $0.completedAt) }).count
+
+        // Map peak hour to nearest 2-hour block start
+        let peakBlock: Int?
+        if let ph = peakHour { peakBlock = (ph / 2) * 2 } else { peakBlock = nil }
+
+        return ProductivitySummary(
+            totalCompletions: records.count,
+            daysTracked: daysTracked,
+            peakHour: peakBlock,
+            onTimeRatePct: onTimeRate,
+            currentStreak: streak,
+            avgSleepHours: avgSleep,
+            sleepDataAvailable: !sleepRecords.isEmpty,
+            eveningPct: eveningPct
+        )
     }
 
     static func generateInsights(from records: [ProductivityRecord]) -> [Insight] {
@@ -47,16 +102,15 @@ enum InsightsEngine {
     static func peakHoursInsight(from records: [ProductivityRecord]) -> Insight? {
         guard records.count >= minimumCompletions else { return nil }
 
-        // Group completions into 2-hour blocks (6 AM – 10 PM)
         var blockCounts = [Int: Int]()
         for record in records {
             let block = (record.completionHour / 2) * 2
             blockCounts[block, default: 0] += 1
         }
-        guard blockCounts.count >= 2 else { return nil }
+        guard !blockCounts.isEmpty else { return nil }
 
         let best = blockCounts.max(by: { $0.value < $1.value })!
-        // Only surface this if the peak block holds ≥20 % of all completions
+        // Surface peak insight as long as the top block holds ≥20 % of completions
         guard Double(best.value) / Double(records.count) >= 0.20 else { return nil }
 
         let maxCount = Double(blockCounts.values.max() ?? 1)
@@ -82,7 +136,7 @@ enum InsightsEngine {
 
     static func sleepInsight(from records: [ProductivityRecord]) -> Insight? {
         let withSleep = records.filter { $0.sleepHours > 0 }
-        guard withSleep.count >= 6 else { return nil }
+        guard withSleep.count >= 4 else { return nil }
 
         let cal = Calendar.current
         var dayData = [Date: (count: Int, sleep: Double)]()
@@ -94,15 +148,15 @@ enum InsightsEngine {
                 dayData[day] = (count: 1, sleep: record.sleepHours)
             }
         }
-        guard dayData.count >= 4 else { return nil }
+        guard dayData.count >= 3 else { return nil }
 
         let goodDays = dayData.values.filter { $0.sleep >= 7.0 }
         let poorDays = dayData.values.filter { $0.sleep < 6.0 }
-        guard goodDays.count >= 2, poorDays.count >= 2 else { return nil }
+        guard goodDays.count >= 1, poorDays.count >= 1 else { return nil }
 
         let avgGood = Double(goodDays.map(\.count).reduce(0, +)) / Double(goodDays.count)
         let avgPoor = Double(poorDays.map(\.count).reduce(0, +)) / Double(poorDays.count)
-        guard avgPoor > 0, avgGood > avgPoor + 0.5 else { return nil }
+        guard avgPoor > 0, avgGood > avgPoor else { return nil }
 
         let uplift = Int(((avgGood - avgPoor) / avgPoor) * 100)
         return Insight(
@@ -159,7 +213,7 @@ enum InsightsEngine {
             )
         }
 
-        if records.count >= 10 && onTimeRate < 50 {
+        if records.count >= 8 && onTimeRate < 50 {
             let slipRate = 100 - onTimeRate
             return Insight(
                 icon: "calendar.badge.clock",
@@ -171,13 +225,22 @@ enum InsightsEngine {
             )
         }
 
-        return nil
+        // Fallback: always surface something useful once we have enough completions
+        let tasksWord = records.count == 1 ? "task" : "tasks"
+        return Insight(
+            icon: "chart.line.uptrend.xyaxis",
+            title: "Building Momentum",
+            body: "You've completed \(records.count) \(tasksWord) across \(sortedDays.count) day(s). Keep going — patterns emerge with more data.",
+            highlight: "\(records.count) done",
+            type: .consistency,
+            chartBars: nil
+        )
     }
 
     // MARK: - Evening Pattern
 
     static func eveningInsight(from records: [ProductivityRecord]) -> Insight? {
-        guard records.count >= 8 else { return nil }
+        guard records.count >= 6 else { return nil }
 
         let evening = records.filter { $0.completionHour >= 20 }
         let rate = Double(evening.count) / Double(records.count)

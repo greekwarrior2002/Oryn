@@ -17,6 +17,8 @@ final class HealthKitManager: ObservableObject {
     // MARK: - Private
 
     private let store: HKHealthStore
+    private var lastFetchDate: Date? = nil
+    private static let fetchThrottleInterval: TimeInterval = 30 * 60  // 30 minutes
 
     init() {
         store = HKHealthStore()
@@ -45,8 +47,16 @@ final class HealthKitManager: ObservableObject {
 
     // MARK: - Data Fetching
 
-    func fetchHealthData() async {
+    func fetchHealthData(ignoreThrottle: Bool = false) async {
         guard HKHealthStore.isHealthDataAvailable() else { return }
+
+        // Avoid hammering HealthKit — skip if we fetched recently unless forced
+        if !ignoreThrottle,
+           let last = lastFetchDate,
+           Date().timeIntervalSince(last) < Self.fetchThrottleInterval {
+            return
+        }
+
         isLoading = true
         defer { isLoading = false }
 
@@ -54,6 +64,7 @@ final class HealthKitManager: ObservableObject {
         async let steps = fetchTodayStepCount()
         let (sleepHours, stepCount) = await (sleep, steps)
         readiness = ReadinessScore.compute(sleepHours: sleepHours, stepCount: stepCount)
+        lastFetchDate = Date()
     }
 
     // MARK: - Sleep

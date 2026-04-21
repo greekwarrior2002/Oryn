@@ -4,8 +4,12 @@ import SwiftData
 @MainActor
 final class InsightsStore: ObservableObject {
     private let context: ModelContext
+    private let aiService: ClaudeInsightsService = ClaudeInsightsService()
+
     @Published var records: [ProductivityRecord] = []
     @Published var insights: [Insight] = []
+    @Published var isGeneratingAI = false
+    @Published var aiError: String? = nil
 
     init(context: ModelContext) {
         self.context = context
@@ -24,6 +28,12 @@ final class InsightsStore: ObservableObject {
         try? context.save()
         fetchRecords()
         refreshInsights()
+
+        // Trigger AI refresh when we first unlock insights, then every 5 completions
+        let count = records.count
+        if aiService.isConfigured && (count == InsightsEngine.minimumCompletions || count % 5 == 0) {
+            Task { await refreshAIInsights() }
+        }
     }
 
     // MARK: - Computed State
@@ -46,16 +56,36 @@ final class InsightsStore: ObservableObject {
         max(0, InsightsEngine.minimumCompletions - records.count)
     }
 
+    // MARK: - AI Insights
+
+    func refreshAIInsights() async {
+        guard aiService.isConfigured, hasEnoughData else { return }
+        isGeneratingAI = true
+        aiError = nil
+        let summary = InsightsEngine.buildSummary(from: records)
+        do {
+            let aiInsights = try await aiService.generateInsights(from: summary)
+            if !aiInsights.isEmpty {
+                insights = aiInsights
+            }
+        } catch AIInsightsError.notConfigured {
+            // Expected when no key is set — silently fall back
+        } catch {
+            aiError = error.localizedDescription
+        }
+        isGeneratingAI = false
+    }
+
     // MARK: - Private
 
-    private func fetchRecords() {
+    func fetchRecords() {
         let descriptor = FetchDescriptor<ProductivityRecord>(
             sortBy: [SortDescriptor(\.completedAt, order: .forward)]
         )
         records = (try? context.fetch(descriptor)) ?? []
     }
 
-    private func refreshInsights() {
+    func refreshInsights() {
         insights = InsightsEngine.generateInsights(from: records)
     }
 }
