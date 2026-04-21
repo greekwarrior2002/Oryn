@@ -13,6 +13,14 @@ struct OrynButton: View {
     var isDestructive: Bool = false
     let action: () -> Void
 
+    init(_ title: String, style: OrynButtonStyle = .primary, icon: String? = nil, isDestructive: Bool = false, action: @escaping () -> Void) {
+        self.title = title
+        self.style = style
+        self.icon = icon
+        self.isDestructive = isDestructive
+        self.action = action
+    }
+
     @State private var isPressed = false
 
     var body: some View {
