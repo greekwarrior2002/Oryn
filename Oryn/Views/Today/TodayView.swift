@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TodayView: View {
     @EnvironmentObject var store: TaskStore
+    @EnvironmentObject var healthKit: HealthKitManager
     @Binding var showAddTask: Bool
 
     var body: some View {
@@ -9,6 +10,8 @@ struct TodayView: View {
             VStack(alignment: .leading, spacing: Spacing.lg) {
                 header
                     .padding(.top, Spacing.xl)
+
+                ReadinessCardView()
 
                 if store.todayTotalMinutes > 0 {
                     DayProgressView(

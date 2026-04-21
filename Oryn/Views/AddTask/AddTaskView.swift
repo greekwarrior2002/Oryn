@@ -8,6 +8,8 @@ struct AddTaskView: View {
     @State private var deadline = Calendar.current.date(byAdding: .day, value: 3, to: Date()) ?? Date()
     @State private var durationMinutes = 30
     @State private var priority: Priority = .medium
+    @State private var energyLevel: EnergyLevel = .medium
+    @State private var energyInferred = false
     @State private var showValidationError = false
 
     @FocusState private var titleFocused: Bool
@@ -23,9 +25,16 @@ struct AddTaskView: View {
                             .focused($titleFocused)
                             .lineLimit(1...4)
                             .submitLabel(.done)
-                            .onChange(of: title) { _, _ in
-                                if showValidationError && !title.isEmpty {
+                            .onChange(of: title) { _, newTitle in
+                                if showValidationError && !newTitle.isEmpty {
                                     withAnimation(.orynSmooth) { showValidationError = false }
+                                }
+                                let inferred = EnergyLevel.inferred(from: newTitle)
+                                if inferred != energyLevel {
+                                    withAnimation(.orynSpring) {
+                                        energyLevel = inferred
+                                        energyInferred = true
+                                    }
                                 }
                             }
 
@@ -67,6 +76,25 @@ struct AddTaskView: View {
                         Text("Priority")
                             .orynFont(.orynSubheadline, color: .orynTextSecondary)
                         PriorityPickerView(selected: $priority)
+                    }
+
+                    Divider()
+
+                    // Energy
+                    VStack(alignment: .leading, spacing: Spacing.sm) {
+                        HStack(spacing: Spacing.xs) {
+                            Text("Energy needed")
+                                .orynFont(.orynSubheadline, color: .orynTextSecondary)
+                            if energyInferred {
+                                Text("· inferred")
+                                    .orynFont(.orynCaption, color: .orynTextTertiary)
+                                    .transition(.opacity)
+                            }
+                        }
+                        EnergyPickerView(selected: $energyLevel)
+                            .onChange(of: energyLevel) { _, _ in
+                                energyInferred = false
+                            }
                     }
 
                     Spacer(minLength: Spacing.xl)
@@ -129,7 +157,8 @@ struct AddTaskView: View {
             title: cleaned,
             deadline: deadline,
             durationMinutes: durationMinutes,
-            priority: priority
+            priority: priority,
+            energyLevel: energyLevel
         )
         dismiss()
     }

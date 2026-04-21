@@ -99,6 +99,105 @@ struct SchedulerEngine {
         redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
     }
 
+    // MARK: - Adaptive Scheduling
+
+    /// Adjusts today's capacity and task ordering based on the user's readiness score.
+    /// Low: reduced today cap + low-energy tasks first. High: expanded cap + high-energy first.
+    static func adaptiveRedistribute(
+        tasks: [OrynTask],
+        dailyCapMinutes: Int = defaultDailyCapMinutes,
+        readiness: ReadinessScore
+    ) {
+        switch readiness.level {
+        case .medium:
+            redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
+
+        case .low:
+            let todayCap = Int(Double(dailyCapMinutes) * 0.65)
+            let today = startOfDay(Date())
+            let tomorrow = nextDay(today)
+
+            // Pre-pin high-energy tasks to start from tomorrow so they won't fill today
+            for task in tasks where !task.isCompleted && task.energyLevel == .high {
+                let deadlineDay = startOfDay(task.deadline)
+                task.scheduledDate = deadlineDay < tomorrow ? deadlineDay : tomorrow
+            }
+
+            redistributeWithOverride(
+                tasks: tasks,
+                dailyCapMinutes: dailyCapMinutes,
+                todayCapOverride: todayCap,
+                sortPredicate: { a, b in
+                    if a.energyLevel.sortWeight != b.energyLevel.sortWeight {
+                        return a.energyLevel.sortWeight < b.energyLevel.sortWeight
+                    }
+                    if a.priority.sortWeight != b.priority.sortWeight {
+                        return a.priority.sortWeight > b.priority.sortWeight
+                    }
+                    return a.deadline < b.deadline
+                }
+            )
+
+        case .high:
+            let todayCap = Int(Double(dailyCapMinutes) * 1.2)
+            redistributeWithOverride(
+                tasks: tasks,
+                dailyCapMinutes: dailyCapMinutes,
+                todayCapOverride: todayCap,
+                sortPredicate: { a, b in
+                    if a.energyLevel.sortWeight != b.energyLevel.sortWeight {
+                        return a.energyLevel.sortWeight > b.energyLevel.sortWeight
+                    }
+                    if a.priority.sortWeight != b.priority.sortWeight {
+                        return a.priority.sortWeight > b.priority.sortWeight
+                    }
+                    return a.deadline < b.deadline
+                }
+            )
+        }
+    }
+
+    @discardableResult
+    private static func redistributeWithOverride(
+        tasks: [OrynTask],
+        dailyCapMinutes: Int,
+        todayCapOverride: Int,
+        sortPredicate: (OrynTask, OrynTask) -> Bool
+    ) -> [Date: Int] {
+        let today = startOfDay(Date())
+        let pending = tasks.filter { !$0.isCompleted }.sorted(by: sortPredicate)
+        var dayLoad: [Date: Int] = [:]
+
+        for task in pending {
+            let deadlineDay = startOfDay(task.deadline)
+            // Respect any pre-pinned scheduledDate as earliest start
+            let earliest = task.scheduledDate.map { max(today, startOfDay($0)) } ?? today
+            var candidate = earliest
+            var assigned = false
+
+            for _ in 0..<365 {
+                if candidate > deadlineDay {
+                    task.scheduledDate = deadlineDay
+                    dayLoad[deadlineDay, default: 0] += task.durationMinutes
+                    assigned = true
+                    break
+                }
+                let cap = Calendar.current.isDate(candidate, inSameDayAs: today)
+                          ? todayCapOverride : dailyCapMinutes
+                let used = dayLoad[candidate, default: 0]
+                if used + task.durationMinutes <= cap {
+                    task.scheduledDate = candidate
+                    dayLoad[candidate, default: 0] += task.durationMinutes
+                    assigned = true
+                    break
+                }
+                candidate = nextDay(candidate)
+            }
+            if !assigned { task.scheduledDate = deadlineDay }
+        }
+        return dayLoad
+    }
+
     // MARK: - Helpers
 
     static func minutesScheduled(on date: Date, tasks: [OrynTask]) -> Int {

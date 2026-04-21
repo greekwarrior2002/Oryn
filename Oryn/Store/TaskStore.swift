@@ -73,8 +73,10 @@ final class TaskStore: ObservableObject {
 
     // MARK: - CRUD
 
-    func addTask(title: String, deadline: Date, durationMinutes: Int, priority: Priority) {
-        let task = OrynTask(title: title, deadline: deadline, durationMinutes: durationMinutes, priority: priority)
+    func addTask(title: String, deadline: Date, durationMinutes: Int, priority: Priority, energyLevel: EnergyLevel? = nil) {
+        let resolved = energyLevel ?? EnergyLevel.inferred(from: title)
+        let task = OrynTask(title: title, deadline: deadline, durationMinutes: durationMinutes,
+                            priority: priority, energyLevel: resolved)
         context.insert(task)
         fetchTasks()
         SchedulerEngine.redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
@@ -121,6 +123,16 @@ final class TaskStore: ObservableObject {
 
     func doneEarly() {
         SchedulerEngine.pullForward(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
+        save()
+        fetchTasks()
+    }
+
+    func applyAdaptiveSchedule(readiness: ReadinessScore) {
+        SchedulerEngine.adaptiveRedistribute(
+            tasks: tasks,
+            dailyCapMinutes: dailyCapMinutes,
+            readiness: readiness
+        )
         save()
         fetchTasks()
     }

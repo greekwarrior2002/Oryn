@@ -34,6 +34,13 @@
 		CCCCCCCCCCCCCCCCCCCCCC19 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB19 /* OnboardingView.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCC1A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB1A /* Assets.xcassets */; };
 		CCCCCCCCCCCCCCCCCCCCCC1B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB1B /* Preview Assets.xcassets */; };
+		CCCCCCCCCCCCCCCCCCCCCC1C /* EnergyLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB1E /* EnergyLevel.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC1D /* OrynMigrationPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB1F /* OrynMigrationPlan.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC1E /* ReadinessScore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB20 /* ReadinessScore.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC1F /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB21 /* HealthKitManager.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC20 /* EnergyPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB22 /* EnergyPickerView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC21 /* ReadinessCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB23 /* ReadinessCardView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC22 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB24 /* HealthKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -65,6 +72,14 @@
 		BBBBBBBBBBBBBBBBBBBBBB1A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBB1B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBB1C /* Oryn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Oryn.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBBBBBBBBBBBBBBBBBBBBB1D /* Oryn.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Oryn.entitlements; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB1E /* EnergyLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnergyLevel.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB1F /* OrynMigrationPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrynMigrationPlan.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB20 /* ReadinessScore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadinessScore.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB21 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB22 /* EnergyPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnergyPickerView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB23 /* ReadinessCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadinessCardView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB24 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +87,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CCCCCCCCCCCCCCCCCCCCCC22 /* HealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,6 +114,7 @@
 			isa = PBXGroup;
 			children = (
 				BBBBBBBBBBBBBBBBBBBBBB01 /* OrynApp.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB1D /* Oryn.entitlements */,
 				DDDDDDDDDDDDDDDDDDDDDD04 /* Models */,
 				DDDDDDDDDDDDDDDDDDDDDD05 /* Scheduling */,
 				DDDDDDDDDDDDDDDDDDDDDD06 /* Store */,
@@ -105,6 +122,7 @@
 				DDDDDDDDDDDDDDDDDDDDDD08 /* Utilities */,
 				DDDDDDDDDDDDDDDDDDDDDD09 /* Components */,
 				DDDDDDDDDDDDDDDDDDDDDD0A /* Views */,
+				DDDDDDDDDDDDDDDDDDDDDD10 /* HealthKit */,
 				BBBBBBBBBBBBBBBBBBBBBB1A /* Assets.xcassets */,
 				DDDDDDDDDDDDDDDDDDDDDD0F /* Preview Content */,
 			);
@@ -117,6 +135,8 @@
 				BBBBBBBBBBBBBBBBBBBBBB02 /* Priority.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB03 /* Task.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB04 /* ScheduleDay.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB1E /* EnergyLevel.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB1F /* OrynMigrationPlan.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -184,6 +204,7 @@
 				BBBBBBBBBBBBBBBBBBBBBB10 /* TaskCardView.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB11 /* DayProgressView.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB12 /* EmptyTodayView.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB23 /* ReadinessCardView.swift */,
 			);
 			path = Today;
 			sourceTree = "<group>";
@@ -194,6 +215,7 @@
 				BBBBBBBBBBBBBBBBBBBBBB13 /* AddTaskView.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB14 /* DurationPickerView.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB15 /* PriorityPickerView.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB22 /* EnergyPickerView.swift */,
 			);
 			path = AddTask;
 			sourceTree = "<group>";
@@ -214,6 +236,15 @@
 				BBBBBBBBBBBBBBBBBBBBBB19 /* OnboardingView.swift */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD10 /* HealthKit */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB20 /* ReadinessScore.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB21 /* HealthKitManager.swift */,
+			);
+			path = HealthKit;
 			sourceTree = "<group>";
 		};
 		DDDDDDDDDDDDDDDDDDDDDD0F /* Preview Content */ = {
@@ -319,6 +350,12 @@
 				CCCCCCCCCCCCCCCCCCCCCC17 /* WeekDaySection.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCC18 /* SettingsView.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCC19 /* OnboardingView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC1C /* EnergyLevel.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC1D /* OrynMigrationPlan.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC1E /* ReadinessScore.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC1F /* HealthKitManager.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC20 /* EnergyPickerView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC21 /* ReadinessCardView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -456,6 +493,8 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Oryn reads your sleep and step data to adjust your daily schedule to match your energy level.";
+				CODE_SIGN_ENTITLEMENTS = Oryn/Oryn.entitlements;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -483,6 +522,8 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Oryn reads your sleep and step data to adjust your daily schedule to match your energy level.";
+				CODE_SIGN_ENTITLEMENTS = Oryn/Oryn.entitlements;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

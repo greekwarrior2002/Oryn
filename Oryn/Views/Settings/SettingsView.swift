@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var store: TaskStore
+    @EnvironmentObject var healthKit: HealthKitManager
     @AppStorage("dailyCapHours") private var dailyCapHours: Double = 4.0
     @AppStorage("workStartHour") private var workStartHour: Double = 9.0
     @AppStorage("workEndHour") private var workEndHour: Double = 18.0
@@ -69,6 +70,50 @@ struct SettingsView: View {
                         .orynFont(.orynCaption, color: .orynTextSecondary)
                 } header: {
                     Text("Work Hours")
+                }
+
+                // MARK: Health
+                Section {
+                    HStack {
+                        Label("Sleep & Activity", systemImage: "heart.fill")
+                            .orynFont(.orynSubheadline)
+                        Spacer()
+                        switch healthKit.authorizationStatus {
+                        case .authorized:
+                            Text("Connected")
+                                .orynFont(.orynSubheadline, color: .orynSuccess)
+                        case .denied:
+                            Text("Denied")
+                                .orynFont(.orynSubheadline, color: .red)
+                        case .unavailable:
+                            Text("Unavailable")
+                                .orynFont(.orynSubheadline, color: .orynTextTertiary)
+                        case .notDetermined:
+                            Button("Connect") {
+                                Task { await healthKit.requestAuthorization() }
+                            }
+                            .foregroundColor(.orynAccent)
+                        }
+                    }
+
+                    if healthKit.authorizationStatus == .authorized {
+                        HStack {
+                            Text("Last readiness")
+                                .orynFont(.orynSubheadline)
+                            Spacer()
+                            Text("\(healthKit.readiness.value) · \(healthKit.readiness.level.label)")
+                                .orynFont(.orynSubheadline, color: .orynTextSecondary)
+                        }
+                        Button("Refresh Health Data") {
+                            Task { await healthKit.fetchHealthData() }
+                        }
+                        .foregroundColor(.orynAccent)
+                    }
+
+                    Text("Oryn reads sleep and steps to adapt your daily schedule. No health data is stored or shared.")
+                        .orynFont(.orynCaption, color: .orynTextSecondary)
+                } header: {
+                    Text("Health")
                 }
 
                 // MARK: About
