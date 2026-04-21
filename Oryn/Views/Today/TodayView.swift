@@ -45,7 +45,7 @@ struct TodayView: View {
 
             // Undo toast — floats above tab bar after a task is completed
             if let task = store.undoTask {
-                UndoToast(message: "Completed "\(task.title)"") {
+                UndoToast(message: "Completed \"\(task.title)\"") {
                     HapticManager.shared.medium()
                     store.undoComplete()
                 }
