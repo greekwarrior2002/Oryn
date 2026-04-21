@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import AVFoundation
 
 /// Entry point for the scan flow. Lets the user pick a source (camera or library),
 /// runs OCR + parsing, then hands off to ScanPreviewView.
@@ -13,6 +14,10 @@ struct ImageScannerView: View {
     @State private var parsedTasks: [ParsedTask] = []
     @State private var showPreview = false
     @State private var processingDots = 0
+    @State private var showPermissionAlert = false
+    @State private var showOCRErrorAlert = false
+    // Stored so it can be invalidated when the view disappears mid-processing.
+    @State private var processingTimer: Timer?
 
     private let ocr    = OCRService()
     private let parser = TaskParserService()
@@ -39,24 +44,54 @@ struct ImageScannerView: View {
                     .foregroundColor(.orynTextSecondary)
                 }
             }
-            .sheet(isPresented: $showCamera) {
-                CameraPickerView { image in
-                    capturedImage = image
-                    showCamera = false
-                    Task { await processImage(image) }
-                }
+            // fullScreenCover is required for UIImagePickerController — presenting it
+            // inside a .sheet causes layout and dismissal issues on iOS 16+.
+            .fullScreenCover(isPresented: $showCamera) {
+                CameraPickerView(
+                    onCapture: { image in
+                        showCamera = false
+                        Task { await processImage(image) }
+                    },
+                    onCancel: {
+                        showCamera = false
+                    }
+                )
                 .ignoresSafeArea()
             }
             .onChange(of: photoItem) { _, item in
                 guard let item else { return }
                 Task {
                     guard let data  = try? await item.loadTransferable(type: Data.self),
-                          let image = UIImage(data: data) else { return }
+                          let image = UIImage(data: data) else {
+                        showOCRErrorAlert = true
+                        return
+                    }
                     await processImage(image)
                 }
             }
             .navigationDestination(isPresented: $showPreview) {
                 ScanPreviewView(tasks: $parsedTasks, onDismiss: { dismiss() })
+            }
+            // Camera permission denied
+            .alert("Camera Access Required", isPresented: $showPermissionAlert) {
+                Button("Open Settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Oryn needs camera access to scan your task lists. Please enable it in Settings > Privacy & Security > Camera.")
+            }
+            // OCR returned no tasks
+            .alert("No Tasks Detected", isPresented: $showOCRErrorAlert) {
+                Button("Try Again", role: .cancel) {}
+            } message: {
+                Text("Oryn couldn't find any tasks in that image. Try better lighting, hold the camera steady, and make sure the text fills most of the frame.")
+            }
+            .onDisappear {
+                processingTimer?.invalidate()
+                processingTimer = nil
             }
         }
         .presentationDetents([.medium, .large])
@@ -83,10 +118,10 @@ struct ImageScannerView: View {
             }
 
             VStack(spacing: Spacing.md) {
-                // Camera button
+                // Camera button — checks permission before presenting
                 Button {
                     HapticManager.shared.medium()
-                    showCamera = true
+                    requestCameraAndPresent()
                 } label: {
                     HStack(spacing: Spacing.sm) {
                         Image(systemName: "camera.fill")
@@ -142,8 +177,27 @@ struct ImageScannerView: View {
                 Text("Detecting tasks" + String(repeating: ".", count: processingDots + 1))
                     .orynFont(.orynSubheadline, color: .orynTextSecondary)
                     .animation(.orynSmooth, value: processingDots)
-                    .onAppear { animateDots() }
+                    .onAppear { startDotsAnimation() }
             }
+        }
+    }
+
+    // MARK: - Camera permission
+
+    private func requestCameraAndPresent() {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            showCamera = true
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video) { granted in
+                DispatchQueue.main.async {
+                    if granted { showCamera = true } else { showPermissionAlert = true }
+                }
+            }
+        case .denied, .restricted:
+            showPermissionAlert = true
+        @unknown default:
+            showCamera = true
         }
     }
 
@@ -160,8 +214,8 @@ struct ImageScannerView: View {
         withAnimation(.orynSmooth) { isProcessing = false }
 
         if tasks.isEmpty {
-            // Nothing recognised — bounce back to picker
             HapticManager.shared.error()
+            showOCRErrorAlert = true
             return
         }
 
@@ -170,8 +224,11 @@ struct ImageScannerView: View {
         showPreview = true
     }
 
-    private func animateDots() {
-        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { t in
+    // Stores a reference so we can invalidate on demand rather than waiting
+    // for the next 0.5 s tick after isProcessing flips to false.
+    private func startDotsAnimation() {
+        processingTimer?.invalidate()
+        processingTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [self] t in
             guard isProcessing else { t.invalidate(); return }
             processingDots = (processingDots + 1) % 3
         }
@@ -182,6 +239,7 @@ struct ImageScannerView: View {
 
 private struct CameraPickerView: UIViewControllerRepresentable {
     let onCapture: (UIImage) -> Void
+    let onCancel: () -> Void
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
@@ -192,19 +250,33 @@ private struct CameraPickerView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
 
-    func makeCoordinator() -> Coordinator { Coordinator(onCapture: onCapture) }
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onCapture: onCapture, onCancel: onCancel)
+    }
 
     final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         let onCapture: (UIImage) -> Void
-        init(onCapture: @escaping (UIImage) -> Void) { self.onCapture = onCapture }
+        let onCancel: () -> Void
+
+        init(onCapture: @escaping (UIImage) -> Void, onCancel: @escaping () -> Void) {
+            self.onCapture = onCapture
+            self.onCancel = onCancel
+        }
 
         func imagePickerController(_ picker: UIImagePickerController,
                                    didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-            if let image = info[.originalImage] as? UIImage { onCapture(image) }
-            picker.dismiss(animated: true)
+            // Do NOT call picker.dismiss here — SwiftUI owns the presentation and
+            // setting showCamera = false (via onCapture/onCancel) triggers teardown.
+            // Calling dismiss a second time causes a double-dismiss crash.
+            if let image = info[.originalImage] as? UIImage {
+                onCapture(image)
+            } else {
+                onCancel()
+            }
         }
+
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            picker.dismiss(animated: true)
+            onCancel()
         }
     }
 }

@@ -612,6 +612,8 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Oryn reads your sleep and step data to adjust your daily schedule to match your energy level.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Oryn uses your camera to scan handwritten or printed task lists.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Oryn accesses your photo library to import images of handwritten task lists.";
 				INFOPLIST_KEY_ANTHROPIC_API_KEY = "$(ANTHROPIC_API_KEY)";
 				CODE_SIGN_ENTITLEMENTS = Oryn/Oryn.entitlements;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -642,6 +644,8 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Oryn reads your sleep and step data to adjust your daily schedule to match your energy level.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Oryn uses your camera to scan handwritten or printed task lists.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Oryn accesses your photo library to import images of handwritten task lists.";
 				INFOPLIST_KEY_ANTHROPIC_API_KEY = "$(ANTHROPIC_API_KEY)";
 				CODE_SIGN_ENTITLEMENTS = Oryn/Oryn.entitlements;
 				LD_RUNPATH_SEARCH_PATHS = (
