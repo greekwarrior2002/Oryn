@@ -45,6 +45,17 @@
 		CCCCCCCCCCCCCCCCCCCCCC24 /* InsightsEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB26 /* InsightsEngine.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCC25 /* InsightsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB27 /* InsightsStore.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCC26 /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB28 /* InsightsView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC27 /* OrynSharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB29 /* OrynSharedContainer.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC28 /* OrynShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB2A /* OrynShortcuts.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC29 /* AddTaskIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB2B /* AddTaskIntent.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC2A /* TodayPlanIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB2C /* TodayPlanIntent.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC2B /* MarkTaskDoneIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB2D /* MarkTaskDoneIntent.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC2C /* EasierDayIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB2E /* EasierDayIntent.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC2D /* ParsedTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB2F /* ParsedTask.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC2E /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB30 /* OCRService.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC2F /* TaskParserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB31 /* TaskParserService.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC30 /* ImageScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB32 /* ImageScannerView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC31 /* ScanPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB33 /* ScanPreviewView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -88,6 +99,17 @@
 		BBBBBBBBBBBBBBBBBBBBBB26 /* InsightsEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsEngine.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBB27 /* InsightsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsStore.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBB28 /* InsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB29 /* OrynSharedContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrynSharedContainer.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB2A /* OrynShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrynShortcuts.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB2B /* AddTaskIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskIntent.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB2C /* TodayPlanIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPlanIntent.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB2D /* MarkTaskDoneIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkTaskDoneIntent.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB2E /* EasierDayIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EasierDayIntent.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB2F /* ParsedTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsedTask.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB30 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB31 /* TaskParserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskParserService.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB32 /* ImageScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageScannerView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB33 /* ScanPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanPreviewView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +149,8 @@
 				DDDDDDDDDDDDDDDDDDDDDD05 /* Scheduling */,
 				DDDDDDDDDDDDDDDDDDDDDD06 /* Store */,
 				DDDDDDDDDDDDDDDDDDDDDD11 /* Insights */,
+				DDDDDDDDDDDDDDDDDDDDDD13 /* Intents */,
+				DDDDDDDDDDDDDDDDDDDDDD14 /* Scanner */,
 				DDDDDDDDDDDDDDDDDDDDDD07 /* Theme */,
 				DDDDDDDDDDDDDDDDDDDDDD08 /* Utilities */,
 				DDDDDDDDDDDDDDDDDDDDDD09 /* Components */,
@@ -204,6 +228,7 @@
 				DDDDDDDDDDDDDDDDDDDDDD0D /* Week */,
 				DDDDDDDDDDDDDDDDDDDDDD0E /* Settings */,
 				DDDDDDDDDDDDDDDDDDDDDD12 /* Insights */,
+				DDDDDDDDDDDDDDDDDDDDDD15 /* Scanner */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -281,6 +306,38 @@
 				BBBBBBBBBBBBBBBBBBBBBB28 /* InsightsView.swift */,
 			);
 			path = Insights;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD13 /* Intents */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB29 /* OrynSharedContainer.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB2A /* OrynShortcuts.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB2B /* AddTaskIntent.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB2C /* TodayPlanIntent.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB2D /* MarkTaskDoneIntent.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB2E /* EasierDayIntent.swift */,
+			);
+			path = Intents;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD14 /* Scanner */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB2F /* ParsedTask.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB30 /* OCRService.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB31 /* TaskParserService.swift */,
+			);
+			path = Scanner;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD15 /* Scanner */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB32 /* ImageScannerView.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB33 /* ScanPreviewView.swift */,
+			);
+			path = Scanner;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -388,6 +445,17 @@
 				CCCCCCCCCCCCCCCCCCCCCC24 /* InsightsEngine.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCC25 /* InsightsStore.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCC26 /* InsightsView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC27 /* OrynSharedContainer.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC28 /* OrynShortcuts.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC29 /* AddTaskIntent.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC2A /* TodayPlanIntent.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC2B /* MarkTaskDoneIntent.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC2C /* EasierDayIntent.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC2D /* ParsedTask.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC2E /* OCRService.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC2F /* TaskParserService.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC30 /* ImageScannerView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC31 /* ScanPreviewView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
