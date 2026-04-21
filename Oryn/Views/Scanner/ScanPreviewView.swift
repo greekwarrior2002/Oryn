@@ -42,7 +42,7 @@ struct ScanPreviewView: View {
 
                 ScrollView {
                     LazyVStack(spacing: Spacing.sm) {
-                        ForEach(Array(tasks.enumerated()), id: \.element.id) { index, task in
+                        ForEach(Array(tasks.enumerated()), id: \.element.id) { (index, task) in
                             ParsedTaskRow(
                                 task: binding(for: task.id),
                                 appeared: appeared.contains(task.id)
@@ -172,10 +172,13 @@ struct ScanPreviewView: View {
     // MARK: - Binding helper
 
     private func binding(for id: UUID) -> Binding<ParsedTask> {
-        Binding(
-            get: { tasks.first(where: { $0.id == id }) ?? ParsedTask(title: "", durationMinutes: 30, priority: .medium) },
+        let fallback = ParsedTask(title: "", durationMinutes: 30, priority: .medium)
+        return Binding<ParsedTask>(
+            get: { self.tasks.first(where: { $0.id == id }) ?? fallback },
             set: { newVal in
-                if let idx = tasks.firstIndex(where: { $0.id == id }) { tasks[idx] = newVal }
+                if let idx = self.tasks.firstIndex(where: { $0.id == id }) {
+                    self.tasks[idx] = newVal
+                }
             }
         )
     }
