@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import AppIntents
 
 @main
 struct OrynApp: App {
@@ -36,6 +37,7 @@ struct OrynApp: App {
                 .modelContainer(container)
                 .onAppear {
                     taskStore.rescheduleMissedTasks()
+                    OrynShortcuts.updateAppShortcutParameters()
                     Task {
                         await healthKitManager.requestAuthorization()
                         taskStore.applyAdaptiveSchedule(readiness: healthKitManager.readiness)

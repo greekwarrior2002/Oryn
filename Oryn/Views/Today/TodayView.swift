@@ -4,6 +4,7 @@ struct TodayView: View {
     @EnvironmentObject var store: TaskStore
     @EnvironmentObject var healthKit: HealthKitManager
     @Binding var showAddTask: Bool
+    @Binding var showScanner: Bool
 
     var body: some View {
         ScrollView {
@@ -50,20 +51,37 @@ struct TodayView: View {
                     .orynFont(.orynLargeTitle)
             }
             Spacer()
-            Button {
-                HapticManager.shared.light()
-                showAddTask = true
-            } label: {
-                ZStack {
-                    Circle()
-                        .fill(Color.orynAccent)
-                        .frame(width: 40, height: 40)
-                    Image(systemName: "plus")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.white)
+            HStack(spacing: Spacing.sm) {
+                Button {
+                    HapticManager.shared.light()
+                    showScanner = true
+                } label: {
+                    ZStack {
+                        Circle()
+                            .fill(Color.orynSurface)
+                            .frame(width: 40, height: 40)
+                        Image(systemName: "doc.text.viewfinder")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(.orynAccent)
+                    }
                 }
+                .buttonStyle(.plain)
+
+                Button {
+                    HapticManager.shared.light()
+                    showAddTask = true
+                } label: {
+                    ZStack {
+                        Circle()
+                            .fill(Color.orynAccent)
+                            .frame(width: 40, height: 40)
+                        Image(systemName: "plus")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
     }
 

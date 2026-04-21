@@ -5,6 +5,7 @@ struct ContentView: View {
     @EnvironmentObject var insightsStore: InsightsStore
     @State private var selectedTab: Tab = .today
     @State private var showAddTask = false
+    @State private var showScanner = false
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @AppStorage("dailyCapHours") private var dailyCapHours: Double = 4.0
 
@@ -20,7 +21,7 @@ struct ContentView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $selectedTab) {
-                TodayView(showAddTask: $showAddTask)
+                TodayView(showAddTask: $showAddTask, showScanner: $showScanner)
                     .tag(Tab.today)
 
                 WeekView(showAddTask: $showAddTask)
@@ -38,6 +39,10 @@ struct ContentView: View {
         .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $showAddTask) {
             AddTaskView()
+                .environmentObject(store)
+        }
+        .sheet(isPresented: $showScanner) {
+            ImageScannerView()
                 .environmentObject(store)
         }
         .fullScreenCover(isPresented: Binding(
