@@ -78,11 +78,11 @@ final class TaskStore: ObservableObject {
         let task = OrynTask(title: title, deadline: deadline, durationMinutes: durationMinutes,
                             priority: priority, energyLevel: resolved)
         context.insert(task)
-        // Single fetch loads the new task into memory so SchedulerEngine can assign it a date;
-        // save persists the scheduled dates, then one more fetch refreshes the published array.
-        fetchTasks()
+        // Append directly so redistribute sees the new task without a round-trip fetch.
+        tasks.append(task)
         SchedulerEngine.redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
         save()
+        // Single fetch to sync the persisted, redistributed state back into the published array.
         fetchTasks()
     }
 
@@ -103,7 +103,8 @@ final class TaskStore: ObservableObject {
 
     func deleteTask(_ task: OrynTask) {
         context.delete(task)
-        fetchTasks()
+        // Remove immediately from the in-memory array before redistribution.
+        tasks.removeAll { $0.id == task.id }
         SchedulerEngine.redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
         save()
         fetchTasks()

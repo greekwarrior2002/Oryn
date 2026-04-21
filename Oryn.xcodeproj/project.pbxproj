@@ -56,6 +56,8 @@
 		CCCCCCCCCCCCCCCCCCCCCC2F /* TaskParserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB31 /* TaskParserService.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCC30 /* ImageScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB32 /* ImageScannerView.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCC31 /* ScanPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB33 /* ScanPreviewView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCCF1 /* AIInsightsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBBF1 /* AIInsightsService.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCCF2 /* LazyTabContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBBF2 /* LazyTabContent.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -110,6 +112,9 @@
 		BBBBBBBBBBBBBBBBBBBBBB31 /* TaskParserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskParserService.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBB32 /* ImageScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageScannerView.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBB33 /* ScanPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanPreviewView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBBF0 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBBF1 /* AIInsightsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIInsightsService.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBBF2 /* LazyTabContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyTabContent.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +150,7 @@
 			children = (
 				BBBBBBBBBBBBBBBBBBBBBB01 /* OrynApp.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB1D /* Oryn.entitlements */,
+				DDDDDDDDDDDDDDDDDDDDDDF0 /* Config */,
 				DDDDDDDDDDDDDDDDDDDDDD04 /* Models */,
 				DDDDDDDDDDDDDDDDDDDDDD05 /* Scheduling */,
 				DDDDDDDDDDDDDDDDDDDDDD06 /* Store */,
@@ -215,6 +221,7 @@
 				BBBBBBBBBBBBBBBBBBBBBB0B /* AnimatedCheckmark.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB0C /* OrynButton.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB0D /* SwipeActionModifier.swift */,
+				BBBBBBBBBBBBBBBBBBBBBBF2 /* LazyTabContent.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -296,8 +303,17 @@
 			children = (
 				BBBBBBBBBBBBBBBBBBBBBB26 /* InsightsEngine.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB27 /* InsightsStore.swift */,
+				BBBBBBBBBBBBBBBBBBBBBBF1 /* AIInsightsService.swift */,
 			);
 			path = Insights;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDDF0 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBBF0 /* Secrets.xcconfig */,
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 		DDDDDDDDDDDDDDDDDDDDDD12 /* Insights */ = {
@@ -456,6 +472,8 @@
 				CCCCCCCCCCCCCCCCCCCCCC2F /* TaskParserService.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCC30 /* ImageScannerView.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCC31 /* ScanPreviewView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCCF1 /* AIInsightsService.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCCF2 /* LazyTabContent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -581,6 +599,7 @@
 		};
 		EEEEEEEEEEEEEEEEEEEEEE0A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BBBBBBBBBBBBBBBBBBBBBBF0 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -594,6 +613,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Oryn reads your sleep and step data to adjust your daily schedule to match your energy level.";
+				INFOPLIST_KEY_ANTHROPIC_API_KEY = "$(ANTHROPIC_API_KEY)";
 				CODE_SIGN_ENTITLEMENTS = Oryn/Oryn.entitlements;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -610,6 +630,7 @@
 		};
 		EEEEEEEEEEEEEEEEEEEEEE0B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BBBBBBBBBBBBBBBBBBBBBBF0 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -623,6 +644,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Oryn reads your sleep and step data to adjust your daily schedule to match your energy level.";
+				INFOPLIST_KEY_ANTHROPIC_API_KEY = "$(ANTHROPIC_API_KEY)";
 				CODE_SIGN_ENTITLEMENTS = Oryn/Oryn.entitlements;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

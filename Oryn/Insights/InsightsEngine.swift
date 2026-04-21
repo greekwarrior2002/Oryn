@@ -1,5 +1,23 @@
 import Foundation
 
+// MARK: - Value-type snapshot of a ProductivityRecord
+// Used to move computation off the main thread safely — SwiftData @Model objects
+// must not be accessed from non-owning actors, so we copy the primitives first.
+
+struct ProductivitySnapshot: Sendable {
+    let completionHour: Int
+    let sleepHours: Double
+    let wasOnTime: Bool
+    let completedAt: Date
+
+    init(_ record: ProductivityRecord) {
+        completionHour = record.completionHour
+        sleepHours     = record.sleepHours
+        wasOnTime      = record.wasOnTime
+        completedAt    = record.completedAt
+    }
+}
+
 // MARK: - Data Structures
 
 struct Insight: Identifiable {
@@ -33,6 +51,17 @@ enum InsightsEngine {
 
     static func canGenerateInsights(from records: [ProductivityRecord]) -> Bool {
         records.count >= minimumCompletions
+    }
+
+    // Snapshot-based entry point — safe to call from any thread / actor.
+    static func generateInsights(from snapshots: [ProductivitySnapshot]) -> [Insight] {
+        guard !snapshots.isEmpty else { return [] }
+        return [
+            peakHoursInsight(from: snapshots),
+            sleepInsight(from: snapshots),
+            consistencyInsight(from: snapshots),
+            eveningInsight(from: snapshots),
+        ].compactMap { $0 }
     }
 
     // Build a productivity summary used by both the local engine and AI service
@@ -87,31 +116,25 @@ enum InsightsEngine {
         )
     }
 
+    // Convenience overload — snapshots on the caller's actor then delegates.
     static func generateInsights(from records: [ProductivityRecord]) -> [Insight] {
-        guard !records.isEmpty else { return [] }
-        return [
-            peakHoursInsight(from: records),
-            sleepInsight(from: records),
-            consistencyInsight(from: records),
-            eveningInsight(from: records),
-        ].compactMap { $0 }
+        generateInsights(from: records.map(ProductivitySnapshot.init))
     }
 
     // MARK: - Peak Productivity Window
 
-    static func peakHoursInsight(from records: [ProductivityRecord]) -> Insight? {
-        guard records.count >= minimumCompletions else { return nil }
+    static func peakHoursInsight(from snapshots: [ProductivitySnapshot]) -> Insight? {
+        guard snapshots.count >= minimumCompletions else { return nil }
 
         var blockCounts = [Int: Int]()
-        for record in records {
-            let block = (record.completionHour / 2) * 2
+        for s in snapshots {
+            let block = (s.completionHour / 2) * 2
             blockCounts[block, default: 0] += 1
         }
         guard !blockCounts.isEmpty else { return nil }
 
         let best = blockCounts.max(by: { $0.value < $1.value })!
-        // Surface peak insight as long as the top block holds ≥20 % of completions
-        guard Double(best.value) / Double(records.count) >= 0.20 else { return nil }
+        guard Double(best.value) / Double(snapshots.count) >= 0.20 else { return nil }
 
         let maxCount = Double(blockCounts.values.max() ?? 1)
         let chartBars: [ChartBar] = stride(from: 6, to: 22, by: 2).map { h in
@@ -134,18 +157,18 @@ enum InsightsEngine {
 
     // MARK: - Sleep Impact
 
-    static func sleepInsight(from records: [ProductivityRecord]) -> Insight? {
-        let withSleep = records.filter { $0.sleepHours > 0 }
+    static func sleepInsight(from snapshots: [ProductivitySnapshot]) -> Insight? {
+        let withSleep = snapshots.filter { $0.sleepHours > 0 }
         guard withSleep.count >= 4 else { return nil }
 
         let cal = Calendar.current
         var dayData = [Date: (count: Int, sleep: Double)]()
-        for record in withSleep {
-            let day = cal.startOfDay(for: record.completedAt)
+        for s in withSleep {
+            let day = cal.startOfDay(for: s.completedAt)
             if let existing = dayData[day] {
-                dayData[day] = (count: existing.count + 1, sleep: record.sleepHours)
+                dayData[day] = (count: existing.count + 1, sleep: s.sleepHours)
             } else {
-                dayData[day] = (count: 1, sleep: record.sleepHours)
+                dayData[day] = (count: 1, sleep: s.sleepHours)
             }
         }
         guard dayData.count >= 3 else { return nil }
@@ -171,12 +194,12 @@ enum InsightsEngine {
 
     // MARK: - Consistency & Streaks
 
-    static func consistencyInsight(from records: [ProductivityRecord]) -> Insight? {
-        guard records.count >= minimumCompletions else { return nil }
+    static func consistencyInsight(from snapshots: [ProductivitySnapshot]) -> Insight? {
+        guard snapshots.count >= minimumCompletions else { return nil }
 
         let cal = Calendar.current
         let today = cal.startOfDay(for: Date())
-        let sortedDays = Set(records.map { cal.startOfDay(for: $0.completedAt) }).sorted(by: >)
+        let sortedDays = Set(snapshots.map { cal.startOfDay(for: $0.completedAt) }).sorted(by: >)
 
         var streak = 0
         var cursor = today
@@ -200,7 +223,7 @@ enum InsightsEngine {
             )
         }
 
-        let onTimeRate = Int(Double(records.filter { $0.wasOnTime }.count) / Double(records.count) * 100)
+        let onTimeRate = Int(Double(snapshots.filter { $0.wasOnTime }.count) / Double(snapshots.count) * 100)
 
         if onTimeRate >= 70 {
             return Insight(
@@ -213,7 +236,7 @@ enum InsightsEngine {
             )
         }
 
-        if records.count >= 8 && onTimeRate < 50 {
+        if snapshots.count >= 8 && onTimeRate < 50 {
             let slipRate = 100 - onTimeRate
             return Insight(
                 icon: "calendar.badge.clock",
@@ -226,12 +249,12 @@ enum InsightsEngine {
         }
 
         // Fallback: always surface something useful once we have enough completions
-        let tasksWord = records.count == 1 ? "task" : "tasks"
+        let tasksWord = snapshots.count == 1 ? "task" : "tasks"
         return Insight(
             icon: "chart.line.uptrend.xyaxis",
             title: "Building Momentum",
-            body: "You've completed \(records.count) \(tasksWord) across \(sortedDays.count) day(s). Keep going — patterns emerge with more data.",
-            highlight: "\(records.count) done",
+            body: "You've completed \(snapshots.count) \(tasksWord) across \(sortedDays.count) day(s). Keep going — patterns emerge with more data.",
+            highlight: "\(snapshots.count) done",
             type: .consistency,
             chartBars: nil
         )
@@ -239,11 +262,11 @@ enum InsightsEngine {
 
     // MARK: - Evening Pattern
 
-    static func eveningInsight(from records: [ProductivityRecord]) -> Insight? {
-        guard records.count >= 6 else { return nil }
+    static func eveningInsight(from snapshots: [ProductivitySnapshot]) -> Insight? {
+        guard snapshots.count >= 6 else { return nil }
 
-        let evening = records.filter { $0.completionHour >= 20 }
-        let rate = Double(evening.count) / Double(records.count)
+        let evening = snapshots.filter { $0.completionHour >= 20 }
+        let rate = Double(evening.count) / Double(snapshots.count)
         guard rate > 0.20 else { return nil }
 
         let pct = Int(rate * 100)
