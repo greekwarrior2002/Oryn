@@ -5,9 +5,12 @@ struct ReadinessCardView: View {
     @State private var isExpanded = false
 
     var body: some View {
-        if healthKit.authorizationStatus == .unavailable {
+        switch healthKit.authorizationStatus {
+        case .unavailable:
             EmptyView()
-        } else {
+        case .notDetermined:
+            connectCTA
+        case .authorized, .denied:
             Button {
                 HapticManager.shared.light()
                 withAnimation(.orynSpring) { isExpanded.toggle() }
@@ -20,6 +23,33 @@ struct ReadinessCardView: View {
             }
             .buttonStyle(.plain)
         }
+    }
+
+    // MARK: - Connect CTA (shown before user grants permission)
+
+    private var connectCTA: some View {
+        Button {
+            HapticManager.shared.light()
+            Task { await healthKit.requestAuthorization() }
+        } label: {
+            HStack(spacing: Spacing.xs) {
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 11))
+                    .foregroundColor(.pink)
+                Text("Connect Health for smarter scheduling")
+                    .orynFont(.orynCaption, color: .orynTextSecondary)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(.orynTextTertiary)
+            }
+            .padding(.horizontal, Spacing.md)
+            .padding(.vertical, Spacing.sm)
+            .background(Capsule().fill(Color.orynSurface))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Connect Apple Health")
+        .accessibilityHint("Lets Oryn adapt your schedule based on sleep and activity")
     }
 
     // MARK: - Collapsed

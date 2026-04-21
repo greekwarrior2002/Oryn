@@ -26,6 +26,32 @@ final class HealthKitManager: ObservableObject {
 
     // MARK: - Authorization
 
+    /// Checks whether authorization has already been granted without prompting the user.
+    /// If already authorized, fetches health data immediately.
+    /// Call this on launch; call requestAuthorization() only from an explicit user action.
+    func checkAuthorizationStatus() async {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            authorizationStatus = .unavailable
+            return
+        }
+        let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
+        let stepType  = HKObjectType.quantityType(forIdentifier: .stepCount)!
+        do {
+            let status = try await store.statusForAuthorizationRequest(
+                toShare: [], read: [sleepType, stepType]
+            )
+            if status == .unnecessary {
+                // Permission already granted — fetch without prompting
+                authorizationStatus = .authorized
+                await fetchHealthData()
+            }
+            // .shouldRequest → leave as .notDetermined; user sees the CTA in the readiness card
+        } catch {
+            authorizationStatus = .unavailable
+        }
+    }
+
+    /// Presents the system HealthKit permission sheet. Call only from an explicit user action.
     func requestAuthorization() async {
         guard HKHealthStore.isHealthDataAvailable() else {
             authorizationStatus = .unavailable

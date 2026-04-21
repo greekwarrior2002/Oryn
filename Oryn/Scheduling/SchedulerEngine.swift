@@ -9,8 +9,15 @@ struct SchedulerEngine {
     /// Assigns a scheduledDate to every incomplete task.
     /// Sort order: priority high→low, then deadline earliest→latest.
     /// Fills each day up to dailyCapMinutes before moving forward.
-    static func redistribute(tasks: [OrynTask], dailyCapMinutes: Int = defaultDailyCapMinutes) {
+    /// - Parameter startFrom: Earliest day eligible for scheduling. Defaults to today.
+    ///   Pass tomorrow when "Too busy today" so pushed tasks cannot land back on today.
+    static func redistribute(
+        tasks: [OrynTask],
+        dailyCapMinutes: Int = defaultDailyCapMinutes,
+        startFrom: Date? = nil
+    ) {
         let today = startOfDay(Date())
+        let earliest = startFrom ?? today
 
         let pending = tasks
             .filter { !$0.isCompleted }
@@ -21,12 +28,19 @@ struct SchedulerEngine {
                 return $0.deadline < $1.deadline
             }
 
-        // Seed the load map with already-completed tasks so their day slots stay counted
+        // Pre-seed with completed tasks so their minutes count against each day's cap.
+        // Without this, a day where you already finished 3h could still accept 4h more.
         var dayLoad: [Date: Int] = [:]
+        for task in tasks where task.isCompleted {
+            if let completedAt = task.completedAt {
+                let day = startOfDay(completedAt)
+                dayLoad[day, default: 0] += task.durationMinutes
+            }
+        }
 
         for task in pending {
             let deadlineDay = startOfDay(task.deadline)
-            var candidate = today
+            var candidate = earliest
             var assigned = false
 
             for _ in 0..<365 {
@@ -76,10 +90,11 @@ struct SchedulerEngine {
 
     // MARK: - "Too Busy Today"
 
-    /// Clears scheduledDate for all incomplete tasks scheduled today,
-    /// then redistributes starting from tomorrow.
+    /// Moves all incomplete tasks scheduled today to tomorrow or later.
+    /// Tasks whose deadline is today remain on today — they can't slip past their due date.
     static func pushTodayForward(tasks: [OrynTask], dailyCapMinutes: Int = defaultDailyCapMinutes) {
         let today = startOfDay(Date())
+        let tomorrow = nextDay(today)
 
         for task in tasks {
             guard !task.isCompleted,
@@ -88,7 +103,9 @@ struct SchedulerEngine {
             task.scheduledDate = nil
         }
 
-        redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
+        // Redistribute from tomorrow so cleared tasks cannot land back on today.
+        // Exception: tasks with today's deadline are still pinned to today by the algorithm.
+        redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes, startFrom: tomorrow)
     }
 
     // MARK: - "Done Early"
@@ -166,7 +183,15 @@ struct SchedulerEngine {
     ) -> [Date: Int] {
         let today = startOfDay(Date())
         let pending = tasks.filter { !$0.isCompleted }.sorted(by: sortPredicate)
+
+        // Pre-seed with completed tasks so their time counts against daily capacity.
         var dayLoad: [Date: Int] = [:]
+        for task in tasks where task.isCompleted {
+            if let completedAt = task.completedAt {
+                let day = startOfDay(completedAt)
+                dayLoad[day, default: 0] += task.durationMinutes
+            }
+        }
 
         for task in pending {
             let deadlineDay = startOfDay(task.deadline)
@@ -211,7 +236,7 @@ struct SchedulerEngine {
         Calendar.current.startOfDay(for: date)
     }
 
-    private static func nextDay(_ date: Date) -> Date {
+    static func nextDay(_ date: Date) -> Date {
         Calendar.current.date(byAdding: .day, value: 1, to: date) ?? date
     }
 }

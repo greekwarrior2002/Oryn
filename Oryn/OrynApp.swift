@@ -39,8 +39,11 @@ struct OrynApp: App {
                     taskStore.rescheduleMissedTasks()
                     OrynShortcuts.updateAppShortcutParameters()
                     Task {
-                        await healthKitManager.requestAuthorization()
-                        taskStore.applyAdaptiveSchedule(readiness: healthKitManager.readiness)
+                        // Check status silently; user opts in via the readiness card CTA.
+                        await healthKitManager.checkAuthorizationStatus()
+                        if healthKitManager.authorizationStatus == .authorized {
+                            taskStore.applyAdaptiveSchedule(readiness: healthKitManager.readiness)
+                        }
                     }
                 }
         }

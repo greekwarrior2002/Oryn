@@ -4,8 +4,6 @@ struct SettingsView: View {
     @EnvironmentObject var store: TaskStore
     @EnvironmentObject var healthKit: HealthKitManager
     @AppStorage("dailyCapHours") private var dailyCapHours: Double = 4.0
-    @AppStorage("workStartHour") private var workStartHour: Double = 9.0
-    @AppStorage("workEndHour") private var workEndHour: Double = 18.0
     // Debounce task so redistribute only runs after the slider settles
     @State private var sliderDebounce: Task<Void, Never>? = nil
 
@@ -41,42 +39,6 @@ struct SettingsView: View {
                     .padding(.vertical, Spacing.xs)
                 } header: {
                     Text("Scheduling")
-                }
-
-                // MARK: Work Hours
-                Section {
-                    HStack {
-                        Label("Start", systemImage: "sunrise.fill")
-                            .orynFont(.orynSubheadline)
-                        Spacer()
-                        Picker("", selection: $workStartHour) {
-                            ForEach(Array(stride(from: 5.0, through: 12.0, by: 0.5)), id: \.self) { h in
-                                Text(hourLabel(h)).tag(h)
-                            }
-                        }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .accentColor(.orynAccent)
-                    }
-
-                    HStack {
-                        Label("End", systemImage: "sunset.fill")
-                            .orynFont(.orynSubheadline)
-                        Spacer()
-                        Picker("", selection: $workEndHour) {
-                            ForEach(Array(stride(from: 12.0, through: 23.0, by: 0.5)), id: \.self) { h in
-                                Text(hourLabel(h)).tag(h)
-                            }
-                        }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .accentColor(.orynAccent)
-                    }
-
-                    Text("Used for future time-block scheduling.")
-                        .orynFont(.orynCaption, color: .orynTextSecondary)
-                } header: {
-                    Text("Work Hours")
                 }
 
                 // MARK: Health
@@ -160,12 +122,4 @@ struct SettingsView: View {
         return "\(h)h \(m)m / day"
     }
 
-    private func hourLabel(_ hour: Double) -> String {
-        let h = Int(hour)
-        let m = Int((hour - Double(h)) * 60)
-        let period = h < 12 ? "AM" : "PM"
-        let displayH = h > 12 ? h - 12 : (h == 0 ? 12 : h)
-        if m == 0 { return "\(displayH):00 \(period)" }
-        return "\(displayH):\(String(format: "%02d", m)) \(period)"
-    }
 }

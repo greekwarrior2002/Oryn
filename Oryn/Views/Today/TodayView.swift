@@ -7,40 +7,54 @@ struct TodayView: View {
     @Binding var showScanner: Bool
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Pinned header — never scrolls away, unaffected by list animations
-            header
-                .padding(.top, Spacing.xl)
-                .padding(.horizontal, Spacing.md)
-                .padding(.bottom, Spacing.md)
+        ZStack(alignment: .bottom) {
+            VStack(spacing: 0) {
+                // Pinned header — never scrolls away, unaffected by list animations
+                header
+                    .padding(.top, Spacing.xl)
+                    .padding(.horizontal, Spacing.md)
+                    .padding(.bottom, Spacing.md)
 
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: Spacing.lg) {
-                    ReadinessCardView()
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: Spacing.lg) {
+                        ReadinessCardView()
 
-                    if store.todayTotalMinutes > 0 {
-                        DayProgressView(
-                            progress: store.todayProgress,
-                            completedMinutes: store.todayCompletedMinutes,
-                            totalMinutes: store.todayTotalMinutes
-                        )
+                        if store.todayTotalMinutes > 0 {
+                            DayProgressView(
+                                progress: store.todayProgress,
+                                completedMinutes: store.todayCompletedMinutes,
+                                totalMinutes: store.todayTotalMinutes
+                            )
+                        }
+
+                        if store.todayTasks.isEmpty && store.completedTodayTasks.isEmpty {
+                            EmptyTodayView(showAddTask: $showAddTask)
+                        } else {
+                            taskSection
+                        }
+
+                        if !store.todayTasks.isEmpty {
+                            contextualActions
+                        }
                     }
-
-                    if store.todayTasks.isEmpty && store.completedTodayTasks.isEmpty {
-                        EmptyTodayView(showAddTask: $showAddTask)
-                    } else {
-                        taskSection
-                    }
-
-                    if !store.todayTasks.isEmpty {
-                        contextualActions
-                    }
+                    .padding(.horizontal, Spacing.md)
+                    .padding(.bottom, 120)
                 }
-                .padding(.horizontal, Spacing.md)
-                .padding(.bottom, 120)
+            }
+            .background(Color.orynBackground.ignoresSafeArea())
+
+            // Undo toast — floats above tab bar after a task is completed
+            if let task = store.undoTask {
+                UndoToast(message: "Completed "\(task.title)"") {
+                    HapticManager.shared.medium()
+                    store.undoComplete()
+                }
+                .padding(.bottom, 90)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .zIndex(10)
             }
         }
-        .background(Color.orynBackground.ignoresSafeArea())
+        .animation(.orynSpring, value: store.undoTask?.id)
     }
 
     // MARK: - Header
@@ -71,6 +85,8 @@ struct TodayView: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Scan tasks")
+                .accessibilityHint("Import tasks from a photo or camera")
 
                 Button {
                     HapticManager.shared.light()
@@ -86,6 +102,8 @@ struct TodayView: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Add task")
+                .accessibilityHint("Opens the new task form")
             }
         }
     }
@@ -124,6 +142,8 @@ struct TodayView: View {
                 }
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Too busy today")
+            .accessibilityHint("Moves all remaining tasks to tomorrow or later")
 
             Spacer()
 
@@ -139,6 +159,8 @@ struct TodayView: View {
                 }
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Done early")
+            .accessibilityHint("Pulls upcoming tasks forward to fill today's remaining capacity")
         }
         .padding(.vertical, Spacing.xs)
     }
@@ -175,5 +197,37 @@ private struct CompletedSection: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Undo Toast
+
+struct UndoToast: View {
+    let message: String
+    let onUndo: () -> Void
+
+    var body: some View {
+        HStack(spacing: Spacing.md) {
+            Text(message)
+                .orynFont(.orynCaption, color: .white)
+                .lineLimit(1)
+                .truncationMode(.tail)
+
+            Spacer()
+
+            Button("Undo", action: onUndo)
+                .orynFont(.orynCaption, color: .orynAccent)
+                .fontWeight(.semibold)
+        }
+        .padding(.horizontal, Spacing.md)
+        .padding(.vertical, Spacing.sm + 2)
+        .background(
+            Capsule()
+                .fill(Color.black.opacity(0.82))
+        )
+        .padding(.horizontal, Spacing.lg)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(message)
+        .accessibilityAction(named: "Undo", onUndo)
     }
 }

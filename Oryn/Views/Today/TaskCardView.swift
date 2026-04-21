@@ -7,6 +7,7 @@ struct TaskCardView: View {
     let task: OrynTask
 
     @State private var isCompleting = false
+    @State private var showEdit = false
 
     var body: some View {
         HStack(alignment: .center, spacing: Spacing.md) {
@@ -22,34 +23,49 @@ struct TaskCardView: View {
                 AnimatedCheckmark(isChecked: task.isCompleted)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(task.isCompleted
+                ? "Mark \(task.title) incomplete"
+                : "Complete \(task.title)")
+            .accessibilityHint(task.isCompleted ? "Removes completion" : "Marks task done")
 
-            // Task info
-            VStack(alignment: .leading, spacing: Spacing.xs) {
-                Text(task.title)
-                    .orynFont(.orynHeadline)
-                    .strikethrough(task.isCompleted, color: .orynTextTertiary)
-                    .foregroundColor(task.isCompleted ? .orynTextTertiary : .orynTextPrimary)
-                    .lineLimit(2)
+            // Task info — tapping opens edit sheet
+            Button {
+                guard !task.isCompleted else { return }
+                HapticManager.shared.light()
+                showEdit = true
+            } label: {
+                VStack(alignment: .leading, spacing: Spacing.xs) {
+                    Text(task.title)
+                        .orynFont(.orynHeadline)
+                        .strikethrough(task.isCompleted, color: .orynTextTertiary)
+                        .foregroundColor(task.isCompleted ? .orynTextTertiary : .orynTextPrimary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
 
-                HStack(spacing: Spacing.sm) {
-                    Label(task.durationLabel, systemImage: "clock")
-                        .orynFont(.orynCaption, color: .orynTextSecondary)
-                        .labelStyle(CompactLabelStyle())
+                    HStack(spacing: Spacing.sm) {
+                        Label(task.durationLabel, systemImage: "clock")
+                            .orynFont(.orynCaption, color: .orynTextSecondary)
+                            .labelStyle(CompactLabelStyle())
 
-                    if task.deadlineIsToday && !task.isCompleted {
-                        DeadlineBadge(isOverdue: false)
-                    } else if task.isOverdue && !task.isCompleted {
-                        DeadlineBadge(isOverdue: true)
+                        if task.deadlineIsToday && !task.isCompleted {
+                            DeadlineBadge(isOverdue: false)
+                        } else if task.isOverdue && !task.isCompleted {
+                            DeadlineBadge(isOverdue: true)
+                        }
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-
-            Spacer()
+            .buttonStyle(.plain)
+            .accessibilityLabel(task.isCompleted ? task.title : "Edit \(task.title)")
+            .accessibilityHint(task.isCompleted ? "" : "Opens task editor")
 
             Circle()
                 .fill(task.priority.color)
                 .frame(width: 8, height: 8)
                 .opacity(task.isCompleted ? 0.3 : 1.0)
+                .accessibilityLabel("\(task.priority.label) priority")
+                .accessibilityHidden(task.isCompleted)
         }
         .padding(Spacing.md)
         .background(
@@ -66,11 +82,49 @@ struct TaskCardView: View {
                 triggerCompletion()
             },
             onTrailing: {
+                guard !task.isCompleted else { return }
                 HapticManager.shared.medium()
                 SoundManager.shared.playReschedule()
-                store.tooBusyToday()
+                store.rescheduleTaskToTomorrow(task)
             }
         )
+        .contextMenu {
+            if !task.isCompleted {
+                Button {
+                    HapticManager.shared.light()
+                    showEdit = true
+                } label: {
+                    Label("Edit Task", systemImage: "pencil")
+                }
+
+                Button {
+                    triggerCompletion()
+                } label: {
+                    Label("Mark Complete", systemImage: "checkmark.circle")
+                }
+
+                Button {
+                    HapticManager.shared.medium()
+                    SoundManager.shared.playReschedule()
+                    store.rescheduleTaskToTomorrow(task)
+                } label: {
+                    Label("Move to Tomorrow", systemImage: "arrow.forward.circle")
+                }
+            }
+
+            Divider()
+
+            Button(role: .destructive) {
+                HapticManager.shared.medium()
+                store.deleteTask(task)
+            } label: {
+                Label("Delete Task", systemImage: "trash")
+            }
+        }
+        .sheet(isPresented: $showEdit) {
+            EditTaskView(task: task)
+                .environmentObject(store)
+        }
     }
 
     private func triggerCompletion() {

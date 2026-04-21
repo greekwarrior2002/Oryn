@@ -8,6 +8,10 @@ final class TaskStore: ObservableObject {
     @Published var tasks: [OrynTask] = []
     @Published var dailyCapMinutes: Int
 
+    /// The most recently completed task, available for undo. Cleared after ~3.5 seconds.
+    @Published var undoTask: OrynTask? = nil
+    private var undoClearJob: Task<Void, Never>? = nil
+
     init(context: ModelContext, dailyCapMinutes: Int = SchedulerEngine.defaultDailyCapMinutes) {
         self.context = context
         self.dailyCapMinutes = dailyCapMinutes
@@ -91,11 +95,49 @@ final class TaskStore: ObservableObject {
         task.completedAt = Date()
         save()
         fetchTasks()
+        scheduleUndoClear(for: task)
     }
 
     func uncompleteTask(_ task: OrynTask) {
         task.isCompleted = false
         task.completedAt = nil
+        undoClearJob?.cancel()
+        undoTask = nil
+        SchedulerEngine.redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
+        save()
+        fetchTasks()
+    }
+
+    func undoComplete() {
+        guard let task = undoTask else { return }
+        undoClearJob?.cancel()
+        undoTask = nil
+        uncompleteTask(task)
+    }
+
+    private func scheduleUndoClear(for task: OrynTask) {
+        undoClearJob?.cancel()
+        undoTask = task
+        undoClearJob = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(3.5))
+            guard !Task.isCancelled else { return }
+            withAnimation(.orynSmooth) { self?.undoTask = nil }
+        }
+    }
+
+    func updateTask(
+        _ task: OrynTask,
+        title: String,
+        deadline: Date,
+        durationMinutes: Int,
+        priority: Priority,
+        energyLevel: EnergyLevel
+    ) {
+        task.title = title
+        task.deadline = deadline
+        task.durationMinutes = durationMinutes
+        task.priority = priority
+        task.energyLevel = energyLevel
         SchedulerEngine.redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
         save()
         fetchTasks()
@@ -106,6 +148,15 @@ final class TaskStore: ObservableObject {
         // Remove immediately from the in-memory array before redistribution.
         tasks.removeAll { $0.id == task.id }
         SchedulerEngine.redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
+        save()
+        fetchTasks()
+    }
+
+    /// Moves a single task from today to tomorrow without disturbing the rest of the schedule.
+    func rescheduleTaskToTomorrow(_ task: OrynTask) {
+        guard !task.isCompleted else { return }
+        let tomorrow = SchedulerEngine.nextDay(SchedulerEngine.startOfDay(Date()))
+        task.scheduledDate = tomorrow
         save()
         fetchTasks()
     }

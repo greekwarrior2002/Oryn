@@ -58,6 +58,8 @@
 		CCCCCCCCCCCCCCCCCCCCCC31 /* ScanPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB33 /* ScanPreviewView.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCCF1 /* AIInsightsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBBF1 /* AIInsightsService.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCCF2 /* LazyTabContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBBF2 /* LazyTabContent.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCCF3 /* EditTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBBF3 /* EditTaskView.swift */; };
+		AA11111111111111111111A1 /* SchedulerEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11111111111111111111A1 /* SchedulerEngineTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -115,6 +117,9 @@
 		BBBBBBBBBBBBBBBBBBBBBBF0 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBBF1 /* AIInsightsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIInsightsService.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBBF2 /* LazyTabContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyTabContent.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBBF3 /* EditTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTaskView.swift; sourceTree = "<group>"; };
+		BB11111111111111111111A1 /* SchedulerEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerEngineTests.swift; sourceTree = "<group>"; };
+		BB11111111111111111111A2 /* OrynTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrynTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +138,7 @@
 			isa = PBXGroup;
 			children = (
 				DDDDDDDDDDDDDDDDDDDDDD03 /* Oryn */,
+				DD11111111111111111111A1 /* OrynTests */,
 				DDDDDDDDDDDDDDDDDDDDDD02 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -141,8 +147,17 @@
 			isa = PBXGroup;
 			children = (
 				BBBBBBBBBBBBBBBBBBBBBB1C /* Oryn.app */,
+				BB11111111111111111111A2 /* OrynTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		DD11111111111111111111A1 /* OrynTests */ = {
+			isa = PBXGroup;
+			children = (
+				BB11111111111111111111A1 /* SchedulerEngineTests.swift */,
+			);
+			path = OrynTests;
 			sourceTree = "<group>";
 		};
 		DDDDDDDDDDDDDDDDDDDDDD03 /* Oryn */ = {
@@ -256,6 +271,7 @@
 			isa = PBXGroup;
 			children = (
 				BBBBBBBBBBBBBBBBBBBBBB13 /* AddTaskView.swift */,
+				BBBBBBBBBBBBBBBBBBBBBBF3 /* EditTaskView.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB14 /* DurationPickerView.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB15 /* PriorityPickerView.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB22 /* EnergyPickerView.swift */,
@@ -376,6 +392,22 @@
 			productReference = BBBBBBBBBBBBBBBBBBBBBB1C /* Oryn.app */;
 			productType = "com.apple.product-type.application";
 		};
+		EE11111111111111111111A2 /* OrynTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EE11111111111111111111A3 /* Build configuration list for PBXNativeTarget "OrynTests" */;
+			buildPhases = (
+				EE11111111111111111111A1 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				EE11111111111111111111A6 /* PBXTargetDependency */,
+			);
+			name = OrynTests;
+			productName = OrynTests;
+			productReference = BB11111111111111111111A2 /* OrynTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -388,6 +420,10 @@
 				TargetAttributes = {
 					EEEEEEEEEEEEEEEEEEEEEE02 = {
 						CreatedOnToolsVersion = 15.0;
+					};
+					EE11111111111111111111A2 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = EEEEEEEEEEEEEEEEEEEEEE02;
 					};
 				};
 			};
@@ -405,6 +441,7 @@
 			projectRoot = "";
 			targets = (
 				EEEEEEEEEEEEEEEEEEEEEE02 /* Oryn */,
+				EE11111111111111111111A2 /* OrynTests */,
 			);
 		};
 /* End PBXProject section */
@@ -474,10 +511,37 @@
 				CCCCCCCCCCCCCCCCCCCCCC31 /* ScanPreviewView.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCCF1 /* AIInsightsService.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCCF2 /* LazyTabContent.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCCF3 /* EditTaskView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EE11111111111111111111A1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA11111111111111111111A1 /* SchedulerEngineTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		EE11111111111111111111A6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EEEEEEEEEEEEEEEEEEEEEE02 /* Oryn */;
+			targetProxy = EE11111111111111111111A7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXContainerItemProxy section */
+		EE11111111111111111111A7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EEEEEEEEEEEEEEEEEEEEEE01 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EEEEEEEEEEEEEEEEEEEEEE02;
+			remoteInfo = Oryn;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin XCBuildConfiguration section */
 		EEEEEEEEEEEEEEEEEEEEEE08 /* Debug */ = {
@@ -661,6 +725,38 @@
 			};
 			name = Release;
 		};
+		EE11111111111111111111A4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Oryn.app/Oryn";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oryn.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		EE11111111111111111111A5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Oryn.app/Oryn";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oryn.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -678,6 +774,15 @@
 			buildConfigurations = (
 				EEEEEEEEEEEEEEEEEEEEEE0A /* Debug */,
 				EEEEEEEEEEEEEEEEEEEEEE0B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EE11111111111111111111A3 /* Build configuration list for PBXNativeTarget "OrynTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EE11111111111111111111A4 /* Debug */,
+				EE11111111111111111111A5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

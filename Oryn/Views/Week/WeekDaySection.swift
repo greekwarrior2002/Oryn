@@ -77,7 +77,12 @@ struct WeekDaySection: View {
 
     private var loadFraction: CGFloat {
         let total = day.totalScheduledMinutes + day.completedMinutes
-        return min(CGFloat(total) / CGFloat(SchedulerEngine.defaultDailyCapMinutes), 1.0)
+        return min(CGFloat(total) / CGFloat(store.dailyCapMinutes), 1.0)
+    }
+
+    // Recompute isFull using the user's actual configured cap, not the static default.
+    private var dayIsFull: Bool {
+        day.totalScheduledMinutes >= store.dailyCapMinutes
     }
 
     private var loadLabel: String {
@@ -85,7 +90,7 @@ struct WeekDaySection: View {
         if total == 0 { return "Free" }
         let h = total / 60, m = total % 60
         let t = h > 0 ? (m > 0 ? "\(h)h \(m)m" : "\(h)h") : "\(m)m"
-        return day.isFull ? "\(t) · Full" : t
+        return dayIsFull ? "\(t) · Full" : t
     }
 
     private var loadBarGradient: LinearGradient {
