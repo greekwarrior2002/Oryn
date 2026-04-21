@@ -42,19 +42,8 @@ struct ScanPreviewView: View {
 
                 ScrollView {
                     LazyVStack(spacing: Spacing.sm) {
-                        ForEach(Array(tasks.enumerated()), id: \.element.id) { (index, task) in
-                            ParsedTaskRow(
-                                task: binding(for: task.id),
-                                appeared: appeared.contains(task.id)
-                            )
-                            .onAppear {
-                                let delay = Double(index) * 0.06
-                                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                                    withAnimation(.orynBounce) {
-                                        appeared.insert(task.id)
-                                    }
-                                }
-                            }
+                        ForEach(tasks.indices, id: \.self) { index in
+                            taskRow(at: index)
                         }
                     }
                     .padding(.horizontal, Spacing.md)
@@ -166,6 +155,25 @@ struct ScanPreviewView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
             HapticManager.shared.light()
             onDismiss()
+        }
+    }
+
+    // MARK: - Row helper
+
+    @ViewBuilder
+    private func taskRow(at index: Int) -> some View {
+        let task = tasks[index]
+        ParsedTaskRow(
+            task: binding(for: task.id),
+            appeared: appeared.contains(task.id)
+        )
+        .onAppear {
+            let delay = Double(index) * 0.06
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                withAnimation(.orynBounce) {
+                    _ = appeared.insert(task.id)
+                }
+            }
         }
     }
 
