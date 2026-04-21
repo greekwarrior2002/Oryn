@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TaskCardView: View {
     @EnvironmentObject var store: TaskStore
-    let task: Task
+    let task: OrynTask
 
     @State private var isCompleting = false
 
@@ -30,12 +30,10 @@ struct TaskCardView: View {
                     .lineLimit(2)
 
                 HStack(spacing: Spacing.sm) {
-                    // Duration
                     Label(task.durationLabel, systemImage: "clock")
                         .orynFont(.orynCaption, color: .orynTextSecondary)
                         .labelStyle(CompactLabelStyle())
 
-                    // Deadline badge (if due today or overdue)
                     if task.deadlineIsToday && !task.isCompleted {
                         DeadlineBadge(isOverdue: false)
                     } else if task.isOverdue && !task.isCompleted {
@@ -46,14 +44,17 @@ struct TaskCardView: View {
 
             Spacer()
 
-            // Priority dot
             Circle()
                 .fill(task.priority.color)
                 .frame(width: 8, height: 8)
                 .opacity(task.isCompleted ? 0.3 : 1.0)
         }
         .padding(Spacing.md)
-        .background(cardBackground)
+        .background(
+            RoundedRectangle(cornerRadius: Radius.md)
+                .fill(Color.orynSurface)
+                .orynCardShadow()
+        )
         .scaleEffect(isCompleting ? 0.93 : 1.0)
         .opacity(isCompleting ? 0 : 1.0)
         .animation(.orynBounce, value: isCompleting)
@@ -70,21 +71,14 @@ struct TaskCardView: View {
         )
     }
 
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: Radius.md)
-            .fill(Color.orynSurface)
-            .orynCardShadow()
-    }
-
     private func triggerCompletion() {
         guard !task.isCompleted else { return }
         HapticManager.shared.success()
         SoundManager.shared.playCompletion()
         withAnimation(.orynBounce) { isCompleting = true }
-        // Delay model update so the shrink-out animation can play
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.32) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             store.completeTask(task)
-            isCompleting = false
+            // isCompleting resets automatically since the view is removed from the list
         }
     }
 }
@@ -98,9 +92,7 @@ private struct DeadlineBadge: View {
             .orynFont(.orynCaption, color: isOverdue ? .red : .orange)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .background(
-                Capsule().fill((isOverdue ? Color.red : Color.orange).opacity(0.12))
-            )
+            .background(Capsule().fill((isOverdue ? Color.red : Color.orange).opacity(0.12)))
     }
 }
 

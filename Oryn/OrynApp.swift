@@ -5,20 +5,19 @@ import SwiftData
 struct OrynApp: App {
     let container: ModelContainer
     @StateObject private var taskStore: TaskStore
-    @AppStorage("dailyCapHours") private var dailyCapHours: Double = 4.0
 
     init() {
-        let schema = Schema([Task.self])
+        let schema = Schema([OrynTask.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
             let c = try ModelContainer(for: schema, configurations: [config])
             container = c
-            _taskStore = StateObject(wrappedValue: TaskStore(
-                context: c.mainContext,
-                dailyCapMinutes: Int((UserDefaults.standard.double(forKey: "dailyCapHours").nonZero ?? 4.0) * 60)
-            ))
+            // Read saved daily cap, default to 4 hours on first launch
+            let savedHours = UserDefaults.standard.double(forKey: "dailyCapHours")
+            let capMinutes = savedHours > 0 ? Int(savedHours * 60) : SchedulerEngine.defaultDailyCapMinutes
+            _taskStore = StateObject(wrappedValue: TaskStore(context: c.mainContext, dailyCapMinutes: capMinutes))
         } catch {
-            fatalError("Failed to create ModelContainer: \(error)")
+            fatalError("SwiftData ModelContainer failed: \(error)")
         }
     }
 
@@ -32,8 +31,4 @@ struct OrynApp: App {
                 }
         }
     }
-}
-
-private extension Double {
-    var nonZero: Double? { self == 0 ? nil : self }
 }

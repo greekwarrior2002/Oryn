@@ -7,47 +7,47 @@ struct ContentView: View {
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @AppStorage("dailyCapHours") private var dailyCapHours: Double = 4.0
 
-    enum Tab: Int {
+    enum Tab: Int, Hashable {
         case today, week, settings
+    }
+
+    init() {
+        // Hide the native UITabBar so our custom one takes over
+        UITabBar.appearance().isHidden = true
     }
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            // Main content
             TabView(selection: $selectedTab) {
                 TodayView(showAddTask: $showAddTask)
                     .tag(Tab.today)
-                    .environmentObject(store)
 
                 WeekView(showAddTask: $showAddTask)
                     .tag(Tab.week)
-                    .environmentObject(store)
 
                 SettingsView()
                     .tag(Tab.settings)
-                    .environmentObject(store)
             }
-            // Hide default tab bar — we render a custom one
-            .tabViewStyle(.page(indexDisplayMode: .never))
 
-            // Custom tab bar
             CustomTabBar(selected: $selectedTab, showAddTask: $showAddTask)
         }
+        .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $showAddTask) {
             AddTaskView()
                 .environmentObject(store)
         }
         .fullScreenCover(isPresented: Binding(
             get: { !hasSeenOnboarding },
-            set: { if !$0 {
-                hasSeenOnboarding = true
-                // Sync daily cap from AppStorage to TaskStore
-                store.updateDailyCap(Int(dailyCapHours * 60))
-            }}
+            set: { shown in
+                if !shown {
+                    hasSeenOnboarding = true
+                    store.updateDailyCap(Int(dailyCapHours * 60))
+                }
+            }
         )) {
             OnboardingView(isPresented: Binding(
                 get: { !hasSeenOnboarding },
-                set: { if !$0 { hasSeenOnboarding = true } }
+                set: { shown in if !shown { hasSeenOnboarding = true } }
             ))
         }
         .onChange(of: dailyCapHours) { _, hours in
@@ -65,39 +65,39 @@ private struct CustomTabBar: View {
     var body: some View {
         HStack(spacing: 0) {
             tabItem(.today, icon: "sun.max.fill", label: "Today")
-            // Center Add button
-            addButton
             tabItem(.week, icon: "calendar", label: "Week")
+            addButton
+            tabItem(.settings, icon: "gearshape.fill", label: "Settings")
         }
         .padding(.horizontal, Spacing.lg)
-        .padding(.vertical, Spacing.sm)
-        .background(
-            RoundedRectangle(cornerRadius: Radius.xl)
-                .fill(Material.ultraThin)
-                .shadow(color: .black.opacity(0.12), radius: 16, x: 0, y: -4)
-        )
-        .padding(.horizontal, Spacing.md)
+        .padding(.top, Spacing.sm)
         .padding(.bottom, Spacing.md)
+        .background(
+            Rectangle()
+                .fill(Material.ultraThin)
+                .ignoresSafeArea(edges: .bottom)
+                .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: -4)
+        )
     }
 
     private func tabItem(_ tab: ContentView.Tab, icon: String, label: String) -> some View {
-        Button {
+        let isSelected = selected == tab
+        return Button {
             HapticManager.shared.light()
             withAnimation(.orynSpring) { selected = tab }
         } label: {
             VStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 20, weight: selected == tab ? .semibold : .regular))
-                    .foregroundColor(selected == tab ? .orynAccent : .orynTextTertiary)
-                    .scaleEffect(selected == tab ? 1.08 : 1.0)
-                    .animation(.orynSpring, value: selected)
+                    .font(.system(size: 20, weight: isSelected ? .semibold : .regular))
+                    .foregroundColor(isSelected ? .orynAccent : .orynTextTertiary)
+                    .scaleEffect(isSelected ? 1.08 : 1.0)
+                    .animation(.orynSpring, value: isSelected)
                 Text(label)
-                    .orynFont(.orynCaption,
-                              color: selected == tab ? .orynAccent : .orynTextTertiary)
+                    .orynFont(.orynCaption, color: isSelected ? .orynAccent : .orynTextTertiary)
             }
+            .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
-        .frame(maxWidth: .infinity)
     }
 
     private var addButton: some View {
@@ -108,15 +108,15 @@ private struct CustomTabBar: View {
             ZStack {
                 Circle()
                     .fill(Color.orynAccent)
-                    .frame(width: 52, height: 52)
-                    .shadow(color: Color.orynAccent.opacity(0.4), radius: 10, x: 0, y: 4)
+                    .frame(width: 50, height: 50)
+                    .shadow(color: Color.orynAccent.opacity(0.35), radius: 10, x: 0, y: 4)
                 Image(systemName: "plus")
-                    .font(.system(size: 22, weight: .semibold))
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(.white)
             }
+            .offset(y: -14)
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
-        .offset(y: -10)
     }
 }

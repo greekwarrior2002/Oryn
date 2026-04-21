@@ -29,10 +29,9 @@ struct TodayView: View {
                 }
             }
             .padding(.horizontal, Spacing.md)
-            .padding(.bottom, 120)
+            .padding(.bottom, 120) // clearance for custom tab bar
         }
         .background(Color.orynBackground.ignoresSafeArea())
-        .animation(.orynSmooth, value: store.todayTasks.map(\.id))
     }
 
     // MARK: - Header
@@ -44,14 +43,10 @@ struct TodayView: View {
                     .orynFont(.orynCaption, color: .orynTextSecondary)
                     .textCase(.uppercase)
                     .tracking(1.2)
-
                 Text("Today")
                     .orynFont(.orynLargeTitle)
             }
-
             Spacer()
-
-            // Add button
             Button {
                 HapticManager.shared.light()
                 showAddTask = true
@@ -73,15 +68,13 @@ struct TodayView: View {
 
     private var taskSection: some View {
         VStack(spacing: Spacing.sm) {
+            // Use id-based animation on the container, not transition on each card.
+            // This avoids conflict with the card's own scale/opacity completion animation.
             ForEach(store.todayTasks) { task in
                 TaskCardView(task: task)
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .top).combined(with: .opacity),
-                        removal: .scale(scale: 0.92).combined(with: .opacity)
-                    ))
             }
+            .animation(.orynSpring, value: store.todayTasks.map(\.id))
 
-            // Completed tasks (collapsed at bottom, dimmed)
             if !store.completedTodayTasks.isEmpty {
                 CompletedSection(tasks: store.completedTodayTasks)
             }
@@ -128,7 +121,7 @@ struct TodayView: View {
 // MARK: - Completed Section
 
 private struct CompletedSection: View {
-    let tasks: [Task]
+    let tasks: [OrynTask]
     @State private var isExpanded = false
 
     var body: some View {

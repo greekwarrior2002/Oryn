@@ -5,41 +5,33 @@ struct WeekDaySection: View {
     @EnvironmentObject var store: TaskStore
     @State private var isExpanded = true
 
-    private let dailyCapMinutes = 240.0
-
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Day header
+            // Day header — tappable to collapse
             Button {
                 HapticManager.shared.light()
                 withAnimation(.orynSpring) { isExpanded.toggle() }
             } label: {
                 HStack(alignment: .center, spacing: Spacing.md) {
-                    // Date label
+                    // Date column
                     VStack(alignment: .leading, spacing: 2) {
                         Text(day.shortDayName.uppercased())
                             .orynFont(.orynCaption, color: day.isToday ? .orynAccent : .orynTextTertiary)
                             .tracking(1.5)
-
                         Text(day.isToday ? "Today" : day.dayNumber)
                             .font(.system(size: 26, weight: day.isToday ? .bold : .regular))
                             .foregroundColor(day.isToday ? .orynTextPrimary : .orynTextSecondary)
                     }
                     .frame(width: 52, alignment: .leading)
 
-                    // Load bar
+                    // Load bar + label
                     VStack(alignment: .leading, spacing: 4) {
                         GeometryReader { geo in
                             ZStack(alignment: .leading) {
-                                Capsule()
-                                    .fill(Color.orynSurface)
-                                    .frame(height: 5)
+                                Capsule().fill(Color.orynSurface).frame(height: 5)
                                 Capsule()
                                     .fill(loadBarGradient)
-                                    .frame(
-                                        width: max(0, geo.size.width * loadFraction),
-                                        height: 5
-                                    )
+                                    .frame(width: max(0, geo.size.width * loadFraction), height: 5)
                                     .animation(.orynRing, value: loadFraction)
                             }
                         }
@@ -59,7 +51,7 @@ struct WeekDaySection: View {
             }
             .buttonStyle(.plain)
 
-            // Task rows (collapsible)
+            // Task rows
             if isExpanded {
                 VStack(spacing: Spacing.xs) {
                     if day.tasks.isEmpty {
@@ -77,50 +69,46 @@ struct WeekDaySection: View {
                 .transition(.move(edge: .top).combined(with: .opacity))
             }
 
-            Divider()
-                .padding(.leading, 52 + Spacing.md)
+            Divider().padding(.leading, 52 + Spacing.md)
         }
     }
 
     private var loadFraction: CGFloat {
-        min(CGFloat(day.totalScheduledMinutes + day.completedMinutes) / dailyCapMinutes, 1.0)
+        let total = day.totalScheduledMinutes + day.completedMinutes
+        return min(CGFloat(total) / CGFloat(SchedulerEngine.defaultDailyCapMinutes), 1.0)
     }
 
     private var loadLabel: String {
         let total = day.totalScheduledMinutes + day.completedMinutes
         if total == 0 { return "Free" }
-        let h = total / 60
-        let m = total % 60
-        let timeStr = h > 0 ? (m > 0 ? "\(h)h \(m)m" : "\(h)h") : "\(m)m"
-        return day.isFull ? "\(timeStr) · Full" : timeStr
+        let h = total / 60, m = total % 60
+        let t = h > 0 ? (m > 0 ? "\(h)h \(m)m" : "\(h)h") : "\(m)m"
+        return day.isFull ? "\(t) · Full" : t
     }
 
     private var loadBarGradient: LinearGradient {
-        let isFull = loadFraction >= 1.0
-        return LinearGradient(
-            colors: isFull ? [.red.opacity(0.8), .red] : [.orynAccent, .orynSuccess],
+        LinearGradient(
+            colors: loadFraction >= 1.0 ? [.red.opacity(0.8), .red] : [.orynAccent, .orynSuccess],
             startPoint: .leading,
             endPoint: .trailing
         )
     }
 }
 
-// MARK: - Week Task Row
+// MARK: - Compact task row for week view
 
 struct WeekTaskRow: View {
-    let task: Task
+    let task: OrynTask
 
     var body: some View {
         HStack(spacing: Spacing.sm) {
-            // Priority color indicator
             RoundedRectangle(cornerRadius: 2)
                 .fill(task.isCompleted ? Color.orynTextTertiary : task.priority.color)
                 .frame(width: 3, height: 28)
                 .opacity(task.isCompleted ? 0.4 : 1.0)
 
             Text(task.title)
-                .orynFont(.orynSubheadline,
-                          color: task.isCompleted ? .orynTextTertiary : .orynTextPrimary)
+                .orynFont(.orynSubheadline, color: task.isCompleted ? .orynTextTertiary : .orynTextPrimary)
                 .strikethrough(task.isCompleted, color: .orynTextTertiary)
                 .lineLimit(1)
 

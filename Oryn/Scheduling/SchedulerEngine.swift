@@ -6,10 +6,10 @@ struct SchedulerEngine {
 
     // MARK: - Main Scheduling
 
-    /// Assigns a scheduledDate to every incomplete, unscheduled task.
-    /// Sorts by priority (high first), then deadline (earliest first).
-    /// Fills days up to dailyCapMinutes before moving to the next day.
-    static func redistribute(tasks: [Task], dailyCapMinutes: Int = defaultDailyCapMinutes) {
+    /// Assigns a scheduledDate to every incomplete task.
+    /// Sort order: priority high→low, then deadline earliest→latest.
+    /// Fills each day up to dailyCapMinutes before moving forward.
+    static func redistribute(tasks: [OrynTask], dailyCapMinutes: Int = defaultDailyCapMinutes) {
         let today = startOfDay(Date())
 
         let pending = tasks
@@ -21,19 +21,17 @@ struct SchedulerEngine {
                 return $0.deadline < $1.deadline
             }
 
-        // Build a load map from already-completed tasks (their slots are taken)
+        // Seed the load map with already-completed tasks so their day slots stay counted
         var dayLoad: [Date: Int] = [:]
 
         for task in pending {
             let deadlineDay = startOfDay(task.deadline)
-            // Start scheduling from today, but never before today
             var candidate = today
-
             var assigned = false
-            // Walk forward up to 365 days to find room
+
             for _ in 0..<365 {
                 if candidate > deadlineDay {
-                    // Can't fit before deadline — assign to deadline day anyway
+                    // Can't fit before deadline — assign to deadline day regardless
                     task.scheduledDate = deadlineDay
                     dayLoad[deadlineDay, default: 0] += task.durationMinutes
                     assigned = true
@@ -49,7 +47,6 @@ struct SchedulerEngine {
                 candidate = nextDay(candidate)
             }
 
-            // Fallback: assign to deadline if loop exhausted
             if !assigned {
                 task.scheduledDate = deadlineDay
             }
@@ -58,9 +55,9 @@ struct SchedulerEngine {
 
     // MARK: - Missed Task Recovery
 
-    /// Called on app launch. Any incomplete task scheduled for a past day gets
-    /// its scheduledDate cleared so redistribute can re-place it.
-    static func rescheduleMissed(tasks: [Task], dailyCapMinutes: Int = defaultDailyCapMinutes) {
+    /// Called on app launch. Clears scheduledDate for any incomplete task
+    /// assigned to a past day, then re-runs redistribution.
+    static func rescheduleMissed(tasks: [OrynTask], dailyCapMinutes: Int = defaultDailyCapMinutes) {
         let today = startOfDay(Date())
         var didChange = false
 
@@ -79,9 +76,9 @@ struct SchedulerEngine {
 
     // MARK: - "Too Busy Today"
 
-    /// Clears scheduledDate for all of today's incomplete tasks, then redistributes.
-    /// Tasks are effectively pushed to the next available day.
-    static func pushTodayForward(tasks: [Task], dailyCapMinutes: Int = defaultDailyCapMinutes) {
+    /// Clears scheduledDate for all incomplete tasks scheduled today,
+    /// then redistributes starting from tomorrow.
+    static func pushTodayForward(tasks: [OrynTask], dailyCapMinutes: Int = defaultDailyCapMinutes) {
         let today = startOfDay(Date())
 
         for task in tasks {
@@ -96,15 +93,15 @@ struct SchedulerEngine {
 
     // MARK: - "Done Early"
 
-    /// Re-runs full distribution. Since completed tasks now free up today's capacity,
-    /// pending tasks naturally get pulled forward.
-    static func pullForward(tasks: [Task], dailyCapMinutes: Int = defaultDailyCapMinutes) {
+    /// Re-runs full distribution. Completed tasks free up capacity,
+    /// so future tasks naturally move forward to fill today.
+    static func pullForward(tasks: [OrynTask], dailyCapMinutes: Int = defaultDailyCapMinutes) {
         redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
     }
 
     // MARK: - Helpers
 
-    static func minutesScheduled(on date: Date, tasks: [Task]) -> Int {
+    static func minutesScheduled(on date: Date, tasks: [OrynTask]) -> Int {
         let day = startOfDay(date)
         return tasks
             .filter { !$0.isCompleted && $0.scheduledDate.map { startOfDay($0) == day } ?? false }

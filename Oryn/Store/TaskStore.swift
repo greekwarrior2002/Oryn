@@ -5,7 +5,7 @@ import SwiftData
 final class TaskStore: ObservableObject {
 
     private let context: ModelContext
-    @Published var tasks: [Task] = []
+    @Published var tasks: [OrynTask] = []
     @Published var dailyCapMinutes: Int
 
     init(context: ModelContext, dailyCapMinutes: Int = SchedulerEngine.defaultDailyCapMinutes) {
@@ -16,7 +16,7 @@ final class TaskStore: ObservableObject {
 
     // MARK: - Computed Views
 
-    var todayTasks: [Task] {
+    var todayTasks: [OrynTask] {
         let today = SchedulerEngine.startOfDay(Date())
         return tasks
             .filter { task in
@@ -27,14 +27,14 @@ final class TaskStore: ObservableObject {
             .sorted { $0.priority.sortWeight > $1.priority.sortWeight }
     }
 
-    var completedTodayTasks: [Task] {
+    var completedTodayTasks: [OrynTask] {
         tasks.filter { task in
-            guard task.isCompleted,
-                  let completedAt = task.completedAt else { return false }
+            guard task.isCompleted, let completedAt = task.completedAt else { return false }
             return Calendar.current.isDateInToday(completedAt)
         }
     }
 
+    /// Next 14 days, only days that have tasks (plus today always included)
     var scheduledDays: [ScheduleDay] {
         let today = SchedulerEngine.startOfDay(Date())
         return (0..<14).compactMap { offset -> ScheduleDay? in
@@ -43,19 +43,18 @@ final class TaskStore: ObservableObject {
                 guard let scheduled = $0.scheduledDate else { return false }
                 return Calendar.current.isDate(scheduled, inSameDayAs: day)
             }
-            // Only show days that have tasks or are today
             guard !dayTasks.isEmpty || offset == 0 else { return nil }
             return ScheduleDay(date: day, tasks: dayTasks)
         }
     }
 
     var todayProgress: Double {
-        let today = tasks.filter { task in
+        let todayAll = tasks.filter { task in
             guard let scheduled = task.scheduledDate else { return false }
             return Calendar.current.isDateInToday(scheduled)
         }
-        let total = today.reduce(0) { $0 + $1.durationMinutes }
-        let done = today.filter { $0.isCompleted }.reduce(0) { $0 + $1.durationMinutes }
+        let total = todayAll.reduce(0) { $0 + $1.durationMinutes }
+        let done = todayAll.filter { $0.isCompleted }.reduce(0) { $0 + $1.durationMinutes }
         guard total > 0 else { return 0 }
         return min(Double(done) / Double(total), 1.0)
     }
@@ -65,17 +64,17 @@ final class TaskStore: ObservableObject {
     }
 
     var todayTotalMinutes: Int {
-        let today = tasks.filter { task in
+        tasks.filter { task in
             guard let scheduled = task.scheduledDate else { return false }
             return Calendar.current.isDateInToday(scheduled)
         }
-        return today.reduce(0) { $0 + $1.durationMinutes }
+        .reduce(0) { $0 + $1.durationMinutes }
     }
 
     // MARK: - CRUD
 
     func addTask(title: String, deadline: Date, durationMinutes: Int, priority: Priority) {
-        let task = Task(title: title, deadline: deadline, durationMinutes: durationMinutes, priority: priority)
+        let task = OrynTask(title: title, deadline: deadline, durationMinutes: durationMinutes, priority: priority)
         context.insert(task)
         fetchTasks()
         SchedulerEngine.redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
@@ -83,14 +82,14 @@ final class TaskStore: ObservableObject {
         fetchTasks()
     }
 
-    func completeTask(_ task: Task) {
+    func completeTask(_ task: OrynTask) {
         task.isCompleted = true
         task.completedAt = Date()
         save()
-        objectWillChange.send()
+        fetchTasks()
     }
 
-    func uncompleteTask(_ task: Task) {
+    func uncompleteTask(_ task: OrynTask) {
         task.isCompleted = false
         task.completedAt = nil
         SchedulerEngine.redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
@@ -98,7 +97,7 @@ final class TaskStore: ObservableObject {
         fetchTasks()
     }
 
-    func deleteTask(_ task: Task) {
+    func deleteTask(_ task: OrynTask) {
         context.delete(task)
         fetchTasks()
         SchedulerEngine.redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
@@ -136,7 +135,7 @@ final class TaskStore: ObservableObject {
     // MARK: - Persistence
 
     func fetchTasks() {
-        let descriptor = FetchDescriptor<Task>(sortBy: [SortDescriptor(\.createdAt)])
+        let descriptor = FetchDescriptor<OrynTask>(sortBy: [SortDescriptor(\.createdAt)])
         tasks = (try? context.fetch(descriptor)) ?? []
     }
 

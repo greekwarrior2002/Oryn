@@ -2,7 +2,7 @@ import Foundation
 
 struct ScheduleDay: Identifiable {
     let date: Date
-    var tasks: [Task]
+    var tasks: [OrynTask]
 
     var id: String {
         date.formatted(.dateTime.year().month().day())

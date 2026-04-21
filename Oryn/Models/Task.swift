@@ -2,7 +2,7 @@ import SwiftData
 import Foundation
 
 @Model
-final class Task {
+final class OrynTask {
     var id: UUID
     var title: String
     var deadline: Date
