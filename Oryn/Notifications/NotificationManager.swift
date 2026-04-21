@@ -19,7 +19,7 @@ final class NotificationManager: ObservableObject {
             let granted = try await UNUserNotificationCenter.current()
                 .requestAuthorization(options: [.alert, .sound, .badge])
             await refreshStatus()
-            if granted { UNUserNotificationCenter.current().setBadgeCount(0) }
+            if granted { try? await UNUserNotificationCenter.current().setBadgeCount(0) }
         } catch {
             // User can enable later from Settings — no crash, no log noise
         }
