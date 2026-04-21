@@ -6,9 +6,10 @@ struct OrynApp: App {
     let container: ModelContainer
     @StateObject private var taskStore: TaskStore
     @StateObject private var healthKitManager = HealthKitManager()
+    @StateObject private var insightsStore: InsightsStore
 
     init() {
-        let schema = Schema([OrynTask.self])
+        let schema = Schema([OrynTask.self, ProductivityRecord.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
             let c = try ModelContainer(
@@ -20,6 +21,7 @@ struct OrynApp: App {
             let savedHours = UserDefaults.standard.double(forKey: "dailyCapHours")
             let capMinutes = savedHours > 0 ? Int(savedHours * 60) : SchedulerEngine.defaultDailyCapMinutes
             _taskStore = StateObject(wrappedValue: TaskStore(context: c.mainContext, dailyCapMinutes: capMinutes))
+            _insightsStore = StateObject(wrappedValue: InsightsStore(context: c.mainContext))
         } catch {
             fatalError("SwiftData ModelContainer failed: \(error)")
         }
@@ -30,6 +32,7 @@ struct OrynApp: App {
             ContentView()
                 .environmentObject(taskStore)
                 .environmentObject(healthKitManager)
+                .environmentObject(insightsStore)
                 .modelContainer(container)
                 .onAppear {
                     taskStore.rescheduleMissedTasks()
