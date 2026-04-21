@@ -213,9 +213,10 @@ private struct ParsedTaskRow: View {
 
             VStack(alignment: .leading, spacing: Spacing.xs) {
                 if isEditing {
-                    TextField("Task title", text: $editTitle, onCommit: commitEdit)
+                    TextField("Task title", text: $editTitle)
                         .orynFont(.orynHeadline)
                         .submitLabel(.done)
+                        .onSubmit { commitEdit() }
                 } else {
                     Text(task.title)
                         .orynFont(.orynHeadline)
