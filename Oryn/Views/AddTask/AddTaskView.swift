@@ -262,3 +262,20 @@ struct AddTaskView: View {
         dismiss()
     }
 }
+
+// MARK: - Row Label helper
+
+struct RowLabel<Content: View>: View {
+    let title: String
+    let icon: String
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        HStack {
+            Label(title, systemImage: icon)
+                .orynFont(.orynSubheadline)
+            Spacer()
+            content
+        }
+    }
+}

@@ -1,18 +1,5 @@
 import Foundation
 
-// MARK: - Productivity summary passed to AI
-
-struct ProductivitySummary {
-    let totalCompletions: Int
-    let daysTracked: Int
-    let peakHour: Int?           // most common completion hour
-    let onTimeRatePct: Int       // 0–100
-    let currentStreak: Int       // consecutive days
-    let avgSleepHours: Double    // 0 if no HealthKit data
-    let sleepDataAvailable: Bool
-    let eveningPct: Int          // % of tasks done after 8 PM
-}
-
 // MARK: - Protocol
 
 protocol AIInsightsService {
