@@ -1,0 +1,523 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CCCCCCCCCCCCCCCCCCCCCC01 /* OrynApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB01 /* OrynApp.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC02 /* Priority.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB02 /* Priority.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC03 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB03 /* Task.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC04 /* ScheduleDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB04 /* ScheduleDay.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC05 /* SchedulerEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB05 /* SchedulerEngine.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC06 /* TaskStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB06 /* TaskStore.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC07 /* OrynTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB07 /* OrynTheme.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC08 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB08 /* Typography.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC09 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB09 /* HapticManager.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC0A /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB0A /* SoundManager.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC0B /* AnimatedCheckmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB0B /* AnimatedCheckmark.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC0C /* OrynButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB0C /* OrynButton.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC0D /* SwipeActionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB0D /* SwipeActionModifier.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC0E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB0E /* ContentView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC0F /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB0F /* TodayView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC10 /* TaskCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB10 /* TaskCardView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC11 /* DayProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB11 /* DayProgressView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC12 /* EmptyTodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB12 /* EmptyTodayView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC13 /* AddTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB13 /* AddTaskView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC14 /* DurationPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB14 /* DurationPickerView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC15 /* PriorityPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB15 /* PriorityPickerView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC16 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB16 /* WeekView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC17 /* WeekDaySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB17 /* WeekDaySection.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC18 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB18 /* SettingsView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC19 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB19 /* OnboardingView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC1A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB1A /* Assets.xcassets */; };
+		CCCCCCCCCCCCCCCCCCCCCC1B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB1B /* Preview Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		BBBBBBBBBBBBBBBBBBBBBB01 /* OrynApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrynApp.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB02 /* Priority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Priority.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB03 /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB04 /* ScheduleDay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleDay.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB05 /* SchedulerEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerEngine.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB06 /* TaskStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStore.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB07 /* OrynTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrynTheme.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB08 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB09 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB0A /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB0B /* AnimatedCheckmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedCheckmark.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB0C /* OrynButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrynButton.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB0D /* SwipeActionModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeActionModifier.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB0E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB0F /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB10 /* TaskCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCardView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB11 /* DayProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayProgressView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB12 /* EmptyTodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyTodayView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB13 /* AddTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB14 /* DurationPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationPickerView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB15 /* PriorityPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriorityPickerView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB16 /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB17 /* WeekDaySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekDaySection.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB18 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB19 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB1A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB1B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB1C /* Oryn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Oryn.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		EEEEEEEEEEEEEEEEEEEEEE05 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DDDDDDDDDDDDDDDDDDDDDD01 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				DDDDDDDDDDDDDDDDDDDDDD03 /* Oryn */,
+				DDDDDDDDDDDDDDDDDDDDDD02 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD02 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB1C /* Oryn.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD03 /* Oryn */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB01 /* OrynApp.swift */,
+				DDDDDDDDDDDDDDDDDDDDDD04 /* Models */,
+				DDDDDDDDDDDDDDDDDDDDDD05 /* Scheduling */,
+				DDDDDDDDDDDDDDDDDDDDDD06 /* Store */,
+				DDDDDDDDDDDDDDDDDDDDDD07 /* Theme */,
+				DDDDDDDDDDDDDDDDDDDDDD08 /* Utilities */,
+				DDDDDDDDDDDDDDDDDDDDDD09 /* Components */,
+				DDDDDDDDDDDDDDDDDDDDDD0A /* Views */,
+				BBBBBBBBBBBBBBBBBBBBBB1A /* Assets.xcassets */,
+				DDDDDDDDDDDDDDDDDDDDDD0F /* Preview Content */,
+			);
+			path = Oryn;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD04 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB02 /* Priority.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB03 /* Task.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB04 /* ScheduleDay.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD05 /* Scheduling */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB05 /* SchedulerEngine.swift */,
+			);
+			path = Scheduling;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD06 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB06 /* TaskStore.swift */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD07 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB07 /* OrynTheme.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB08 /* Typography.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD08 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB09 /* HapticManager.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB0A /* SoundManager.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD09 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB0B /* AnimatedCheckmark.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB0C /* OrynButton.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB0D /* SwipeActionModifier.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD0A /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB0E /* ContentView.swift */,
+				DDDDDDDDDDDDDDDDDDDDDD0B /* Today */,
+				DDDDDDDDDDDDDDDDDDDDDD0C /* AddTask */,
+				DDDDDDDDDDDDDDDDDDDDDD0D /* Week */,
+				DDDDDDDDDDDDDDDDDDDDDD0E /* Settings */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD0B /* Today */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB0F /* TodayView.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB10 /* TaskCardView.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB11 /* DayProgressView.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB12 /* EmptyTodayView.swift */,
+			);
+			path = Today;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD0C /* AddTask */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB13 /* AddTaskView.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB14 /* DurationPickerView.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB15 /* PriorityPickerView.swift */,
+			);
+			path = AddTask;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD0D /* Week */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB16 /* WeekView.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB17 /* WeekDaySection.swift */,
+			);
+			path = Week;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD0E /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB18 /* SettingsView.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB19 /* OnboardingView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD0F /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB1B /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		EEEEEEEEEEEEEEEEEEEEEE02 /* Oryn */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EEEEEEEEEEEEEEEEEEEEEE07 /* Build configuration list for PBXNativeTarget "Oryn" */;
+			buildPhases = (
+				EEEEEEEEEEEEEEEEEEEEEE03 /* Sources */,
+				EEEEEEEEEEEEEEEEEEEEEE04 /* Resources */,
+				EEEEEEEEEEEEEEEEEEEEEE05 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Oryn;
+			productName = Oryn;
+			productReference = BBBBBBBBBBBBBBBBBBBBBB1C /* Oryn.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		EEEEEEEEEEEEEEEEEEEEEE01 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					EEEEEEEEEEEEEEEEEEEEEE02 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = EEEEEEEEEEEEEEEEEEEEEE06 /* Build configuration list for PBXProject "Oryn" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DDDDDDDDDDDDDDDDDDDDDD01;
+			productRefGroup = DDDDDDDDDDDDDDDDDDDDDD02 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EEEEEEEEEEEEEEEEEEEEEE02 /* Oryn */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EEEEEEEEEEEEEEEEEEEEEE04 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CCCCCCCCCCCCCCCCCCCCCC1B /* Preview Assets.xcassets in Resources */,
+				CCCCCCCCCCCCCCCCCCCCCC1A /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EEEEEEEEEEEEEEEEEEEEEE03 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CCCCCCCCCCCCCCCCCCCCCC01 /* OrynApp.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC02 /* Priority.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC03 /* Task.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC04 /* ScheduleDay.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC05 /* SchedulerEngine.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC06 /* TaskStore.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC07 /* OrynTheme.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC08 /* Typography.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC09 /* HapticManager.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC0A /* SoundManager.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC0B /* AnimatedCheckmark.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC0C /* OrynButton.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC0D /* SwipeActionModifier.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC0E /* ContentView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC0F /* TodayView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC10 /* TaskCardView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC11 /* DayProgressView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC12 /* EmptyTodayView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC13 /* AddTaskView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC14 /* DurationPickerView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC15 /* PriorityPickerView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC16 /* WeekView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC17 /* WeekDaySection.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC18 /* SettingsView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC19 /* OnboardingView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		EEEEEEEEEEEEEEEEEEEEEE08 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		EEEEEEEEEEEEEEEEEEEEEE09 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		EEEEEEEEEEEEEEEEEEEEEE0A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Oryn/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oryn.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		EEEEEEEEEEEEEEEEEEEEEE0B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Oryn/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oryn.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		EEEEEEEEEEEEEEEEEEEEEE06 /* Build configuration list for PBXProject "Oryn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EEEEEEEEEEEEEEEEEEEEEE08 /* Debug */,
+				EEEEEEEEEEEEEEEEEEEEEE09 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EEEEEEEEEEEEEEEEEEEEEE07 /* Build configuration list for PBXNativeTarget "Oryn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EEEEEEEEEEEEEEEEEEEEEE0A /* Debug */,
+				EEEEEEEEEEEEEEEEEEEEEE0B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = EEEEEEEEEEEEEEEEEEEEEE01 /* Project object */;
+}
