@@ -59,7 +59,12 @@
 		CCCCCCCCCCCCCCCCCCCCCCF1 /* AIInsightsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBBF1 /* AIInsightsService.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCCF2 /* LazyTabContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBBF2 /* LazyTabContent.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCCF3 /* EditTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBBF3 /* EditTaskView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC40 /* RecurrenceRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB40 /* RecurrenceRule.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC41 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB41 /* NotificationManager.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC42 /* RecurrencePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB42 /* RecurrencePickerView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC43 /* SchedulingControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB43 /* SchedulingControlsView.swift */; };
 		AA11111111111111111111A1 /* SchedulerEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11111111111111111111A1 /* SchedulerEngineTests.swift */; };
+		AA11111111111111111111A3 /* RecurringTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11111111111111111111A3 /* RecurringTaskTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -118,7 +123,12 @@
 		BBBBBBBBBBBBBBBBBBBBBBF1 /* AIInsightsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIInsightsService.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBBF2 /* LazyTabContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyTabContent.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBBF3 /* EditTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTaskView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB40 /* RecurrenceRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceRule.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB41 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB42 /* RecurrencePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrencePickerView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB43 /* SchedulingControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulingControlsView.swift; sourceTree = "<group>"; };
 		BB11111111111111111111A1 /* SchedulerEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerEngineTests.swift; sourceTree = "<group>"; };
+		BB11111111111111111111A3 /* RecurringTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTaskTests.swift; sourceTree = "<group>"; };
 		BB11111111111111111111A2 /* OrynTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrynTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -156,8 +166,17 @@
 			isa = PBXGroup;
 			children = (
 				BB11111111111111111111A1 /* SchedulerEngineTests.swift */,
+				BB11111111111111111111A3 /* RecurringTaskTests.swift */,
 			);
 			path = OrynTests;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD20 /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB41 /* NotificationManager.swift */,
+			);
+			path = Notifications;
 			sourceTree = "<group>";
 		};
 		DDDDDDDDDDDDDDDDDDDDDD03 /* Oryn */ = {
@@ -172,6 +191,7 @@
 				DDDDDDDDDDDDDDDDDDDDDD11 /* Insights */,
 				DDDDDDDDDDDDDDDDDDDDDD13 /* Intents */,
 				DDDDDDDDDDDDDDDDDDDDDD14 /* Scanner */,
+				DDDDDDDDDDDDDDDDDDDDDD20 /* Notifications */,
 				DDDDDDDDDDDDDDDDDDDDDD07 /* Theme */,
 				DDDDDDDDDDDDDDDDDDDDDD08 /* Utilities */,
 				DDDDDDDDDDDDDDDDDDDDDD09 /* Components */,
@@ -192,6 +212,7 @@
 				BBBBBBBBBBBBBBBBBBBBBB1E /* EnergyLevel.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB1F /* OrynMigrationPlan.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB25 /* ProductivityRecord.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB40 /* RecurrenceRule.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -275,6 +296,8 @@
 				BBBBBBBBBBBBBBBBBBBBBB14 /* DurationPickerView.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB15 /* PriorityPickerView.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB22 /* EnergyPickerView.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB42 /* RecurrencePickerView.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB43 /* SchedulingControlsView.swift */,
 			);
 			path = AddTask;
 			sourceTree = "<group>";
@@ -512,6 +535,10 @@
 				CCCCCCCCCCCCCCCCCCCCCCF1 /* AIInsightsService.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCCF2 /* LazyTabContent.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCCF3 /* EditTaskView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC40 /* RecurrenceRule.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC41 /* NotificationManager.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC42 /* RecurrencePickerView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC43 /* SchedulingControlsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -520,6 +547,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA11111111111111111111A1 /* SchedulerEngineTests.swift in Sources */,
+				AA11111111111111111111A3 /* RecurringTaskTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

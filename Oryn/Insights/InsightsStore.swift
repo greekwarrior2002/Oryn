@@ -8,6 +8,7 @@ final class InsightsStore: ObservableObject {
 
     @Published var records: [ProductivityRecord] = []
     @Published var insights: [Insight] = []
+    @Published var weeklyReview: WeeklyReviewSummary? = nil
     @Published var isGeneratingAI = false
     @Published var aiError: String? = nil
 
@@ -29,7 +30,6 @@ final class InsightsStore: ObservableObject {
         fetchRecords()
         refreshInsights()
 
-        // Trigger AI refresh when we first unlock insights, then every 5 completions
         let count = records.count
         if aiService.isConfigured && (count == InsightsEngine.minimumCompletions || count % 5 == 0) {
             Task { await refreshAIInsights() }
@@ -65,9 +65,7 @@ final class InsightsStore: ObservableObject {
         let summary = InsightsEngine.buildSummary(from: records)
         do {
             let aiInsights = try await aiService.generateInsights(from: summary)
-            if !aiInsights.isEmpty {
-                insights = aiInsights
-            }
+            if !aiInsights.isEmpty { insights = aiInsights }
         } catch AIInsightsError.notConfigured {
             // Expected when no key is set — silently fall back
         } catch {
@@ -86,15 +84,16 @@ final class InsightsStore: ObservableObject {
     }
 
     func refreshInsights() {
-        // Snapshot on main actor first — @Model objects must not cross actor boundaries.
         let snapshots = records.map(ProductivitySnapshot.init)
-        // Outer Task inherits @MainActor context so `self` assignment is safe.
-        // Inner detached task runs the CPU work off the main thread.
         Task { [weak self] in
             let generated = await Task.detached(priority: .utility) {
                 InsightsEngine.generateInsights(from: snapshots)
             }.value
-            self?.insights = generated
+            let review = await Task.detached(priority: .utility) {
+                InsightsEngine.weeklyReview(from: snapshots)
+            }.value
+            self?.insights     = generated
+            self?.weeklyReview = review
         }
     }
 }

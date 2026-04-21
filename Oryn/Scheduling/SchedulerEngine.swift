@@ -6,21 +6,25 @@ struct SchedulerEngine {
 
     // MARK: - Main Scheduling
 
-    /// Assigns a scheduledDate to every incomplete task.
-    /// Sort order: priority high→low, then deadline earliest→latest.
-    /// Fills each day up to dailyCapMinutes before moving forward.
-    /// - Parameter startFrom: Earliest day eligible for scheduling. Defaults to today.
-    ///   Pass tomorrow when "Too busy today" so pushed tasks cannot land back on today.
+    /// Assigns a scheduledDate to every schedulable incomplete task.
+    ///
+    /// Rules:
+    /// - Backlog tasks (isInBacklog) are skipped entirely — no scheduledDate assigned.
+    /// - Locked tasks (isLocked) keep their current scheduledDate; their load is pre-seeded.
+    /// - Pinned tasks (schedulePinnedDate != nil) are placed on that exact day.
+    /// - notBeforeDate shifts the earliest candidate forward for a task.
+    /// - Sort order: priority high→low, then deadline earliest→latest.
+    /// - Fills each day to dailyCapMinutes before advancing.
     static func redistribute(
         tasks: [OrynTask],
         dailyCapMinutes: Int = defaultDailyCapMinutes,
         startFrom: Date? = nil
     ) {
-        let today = startOfDay(Date())
+        let today    = startOfDay(Date())
         let earliest = startFrom ?? today
 
         let pending = tasks
-            .filter { !$0.isCompleted }
+            .filter { !$0.isCompleted && !$0.isInBacklog && !$0.isLocked }
             .sorted {
                 if $0.priority.sortWeight != $1.priority.sortWeight {
                     return $0.priority.sortWeight > $1.priority.sortWeight
@@ -28,8 +32,7 @@ struct SchedulerEngine {
                 return $0.deadline < $1.deadline
             }
 
-        // Pre-seed with completed tasks so their minutes count against each day's cap.
-        // Without this, a day where you already finished 3h could still accept 4h more.
+        // Pre-seed completed work so their minutes count against each day's cap.
         var dayLoad: [Date: Int] = [:]
         for task in tasks where task.isCompleted {
             if let completedAt = task.completedAt {
@@ -37,15 +40,32 @@ struct SchedulerEngine {
                 dayLoad[day, default: 0] += task.durationMinutes
             }
         }
+        // Pre-seed locked tasks (they hold their slot during this redistribution).
+        for task in tasks where !task.isCompleted && !task.isInBacklog && task.isLocked {
+            if let scheduled = task.scheduledDate {
+                let day = startOfDay(scheduled)
+                dayLoad[day, default: 0] += task.durationMinutes
+            }
+        }
 
         for task in pending {
             let deadlineDay = startOfDay(task.deadline)
-            var candidate = earliest
-            var assigned = false
+
+            // Pinned task: place directly on the pinned day regardless of capacity.
+            if let pinned = task.schedulePinnedDate {
+                let pinnedDay = startOfDay(pinned)
+                task.scheduledDate = pinnedDay
+                dayLoad[pinnedDay, default: 0] += task.durationMinutes
+                continue
+            }
+
+            // notBeforeDate pushes the earliest eligible day forward.
+            let notBefore = task.scheduleNotBeforeDate.map { max(earliest, startOfDay($0)) } ?? earliest
+            var candidate = notBefore
+            var assigned  = false
 
             for _ in 0..<365 {
                 if candidate > deadlineDay {
-                    // Can't fit before deadline — assign to deadline day regardless
                     task.scheduledDate = deadlineDay
                     dayLoad[deadlineDay, default: 0] += task.durationMinutes
                     assigned = true
@@ -72,11 +92,14 @@ struct SchedulerEngine {
     /// Called on app launch. Clears scheduledDate for any incomplete task
     /// assigned to a past day, then re-runs redistribution.
     static func rescheduleMissed(tasks: [OrynTask], dailyCapMinutes: Int = defaultDailyCapMinutes) {
-        let today = startOfDay(Date())
-        var didChange = false
+        let today      = startOfDay(Date())
+        var didChange  = false
 
         for task in tasks {
             guard !task.isCompleted,
+                  !task.isInBacklog,
+                  !task.isLocked,
+                  task.schedulePinnedDate == nil,
                   let scheduled = task.scheduledDate,
                   scheduled < today else { continue }
             task.scheduledDate = nil
@@ -90,21 +113,22 @@ struct SchedulerEngine {
 
     // MARK: - "Too Busy Today"
 
-    /// Moves all incomplete tasks scheduled today to tomorrow or later.
+    /// Moves all incomplete non-locked tasks scheduled today to tomorrow or later.
     /// Tasks whose deadline is today remain on today — they can't slip past their due date.
     static func pushTodayForward(tasks: [OrynTask], dailyCapMinutes: Int = defaultDailyCapMinutes) {
-        let today = startOfDay(Date())
+        let today    = startOfDay(Date())
         let tomorrow = nextDay(today)
 
         for task in tasks {
             guard !task.isCompleted,
+                  !task.isInBacklog,
+                  !task.isLocked,
+                  task.schedulePinnedDate == nil,
                   let scheduled = task.scheduledDate,
                   Calendar.current.isDate(scheduled, inSameDayAs: today) else { continue }
             task.scheduledDate = nil
         }
 
-        // Redistribute from tomorrow so cleared tasks cannot land back on today.
-        // Exception: tasks with today's deadline are still pinned to today by the algorithm.
         redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes, startFrom: tomorrow)
     }
 
@@ -119,7 +143,6 @@ struct SchedulerEngine {
     // MARK: - Adaptive Scheduling
 
     /// Adjusts today's capacity and task ordering based on the user's readiness score.
-    /// Low: reduced today cap + low-energy tasks first. High: expanded cap + high-energy first.
     static func adaptiveRedistribute(
         tasks: [OrynTask],
         dailyCapMinutes: Int = defaultDailyCapMinutes,
@@ -131,11 +154,10 @@ struct SchedulerEngine {
 
         case .low:
             let todayCap = Int(Double(dailyCapMinutes) * 0.65)
-            let today = startOfDay(Date())
+            let today    = startOfDay(Date())
             let tomorrow = nextDay(today)
 
-            // Pre-pin high-energy tasks to start from tomorrow so they won't fill today
-            for task in tasks where !task.isCompleted && task.energyLevel == .high {
+            for task in tasks where !task.isCompleted && !task.isInBacklog && task.energyLevel == .high {
                 let deadlineDay = startOfDay(task.deadline)
                 task.scheduledDate = deadlineDay < tomorrow ? deadlineDay : tomorrow
             }
@@ -181,10 +203,11 @@ struct SchedulerEngine {
         todayCapOverride: Int,
         sortPredicate: (OrynTask, OrynTask) -> Bool
     ) -> [Date: Int] {
-        let today = startOfDay(Date())
-        let pending = tasks.filter { !$0.isCompleted }.sorted(by: sortPredicate)
+        let today   = startOfDay(Date())
+        let pending = tasks
+            .filter { !$0.isCompleted && !$0.isInBacklog && !$0.isLocked }
+            .sorted(by: sortPredicate)
 
-        // Pre-seed with completed tasks so their time counts against daily capacity.
         var dayLoad: [Date: Int] = [:]
         for task in tasks where task.isCompleted {
             if let completedAt = task.completedAt {
@@ -192,13 +215,27 @@ struct SchedulerEngine {
                 dayLoad[day, default: 0] += task.durationMinutes
             }
         }
+        for task in tasks where !task.isCompleted && !task.isInBacklog && task.isLocked {
+            if let scheduled = task.scheduledDate {
+                let day = startOfDay(scheduled)
+                dayLoad[day, default: 0] += task.durationMinutes
+            }
+        }
 
         for task in pending {
             let deadlineDay = startOfDay(task.deadline)
-            // Respect any pre-pinned scheduledDate as earliest start
-            let earliest = task.scheduledDate.map { max(today, startOfDay($0)) } ?? today
+
+            if let pinned = task.schedulePinnedDate {
+                let pinnedDay = startOfDay(pinned)
+                task.scheduledDate = pinnedDay
+                dayLoad[pinnedDay, default: 0] += task.durationMinutes
+                continue
+            }
+
+            let notBefore = task.scheduleNotBeforeDate.map { max(today, startOfDay($0)) } ?? today
+            let earliest  = task.scheduledDate.map { max(notBefore, startOfDay($0)) } ?? notBefore
             var candidate = earliest
-            var assigned = false
+            var assigned  = false
 
             for _ in 0..<365 {
                 if candidate > deadlineDay {
@@ -207,8 +244,8 @@ struct SchedulerEngine {
                     assigned = true
                     break
                 }
-                let cap = Calendar.current.isDate(candidate, inSameDayAs: today)
-                          ? todayCapOverride : dailyCapMinutes
+                let cap  = Calendar.current.isDate(candidate, inSameDayAs: today)
+                           ? todayCapOverride : dailyCapMinutes
                 let used = dayLoad[candidate, default: 0]
                 if used + task.durationMinutes <= cap {
                     task.scheduledDate = candidate

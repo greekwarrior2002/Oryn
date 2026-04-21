@@ -8,7 +8,9 @@ struct ScanPreviewView: View {
 
     @State private var appeared: Set<UUID> = []
     @State private var showSuccess = false
-    @State private var addedCount = 0
+    @State private var addedCount  = 0
+    @State private var showDuplicateWarning = false
+    @State private var duplicateTitles: [String] = []
 
     private var selectedCount: Int { tasks.filter(\.isSelected).count }
 
@@ -17,55 +19,67 @@ struct ScanPreviewView: View {
             Color.orynBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Subtitle bar
-                HStack {
-                    Text("\(tasks.count) task\(tasks.count == 1 ? "" : "s") detected")
-                        .orynFont(.orynCaption, color: .orynTextSecondary)
-                    Spacer()
-                    Button {
-                        HapticManager.shared.selectionChanged()
-                        let all = tasks.allSatisfy(\.isSelected)
-                        withAnimation(.orynSpring) {
-                            for i in tasks.indices { tasks[i].isSelected = !all }
-                        }
-                    } label: {
-                        Text(tasks.allSatisfy(\.isSelected) ? "Deselect all" : "Select all")
-                            .orynFont(.orynCaption, color: .orynAccent)
-                    }
-                    .buttonStyle(.plain)
-                }
-                .padding(.horizontal, Spacing.md)
-                .padding(.top, Spacing.sm)
-                .padding(.bottom, Spacing.xs)
-
+                controlBar
                 Divider()
-
-                ScrollView {
-                    LazyVStack(spacing: Spacing.sm) {
-                        ForEach(tasks.indices, id: \.self) { index in
-                            taskRow(at: index)
-                        }
-                    }
-                    .padding(.horizontal, Spacing.md)
-                    .padding(.top, Spacing.md)
-                    .padding(.bottom, 120)
-                }
+                taskList
             }
 
-            // Fixed bottom action bar
             VStack {
                 Spacer()
                 bottomBar
             }
 
-            // Success flash
-            if showSuccess {
-                successOverlay
-            }
+            if showSuccess { successOverlay }
         }
         .navigationTitle("Review Tasks")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(showSuccess)
+        .alert("Possible Duplicates", isPresented: $showDuplicateWarning) {
+            Button("Import Anyway") { performImport() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            let titles = duplicateTitles.prefix(3).joined(separator: ", ")
+            Text("These tasks look similar to ones you already have: \(titles). Import anyway?")
+        }
+    }
+
+    // MARK: - Control Bar
+
+    private var controlBar: some View {
+        HStack {
+            Text("\(tasks.count) task\(tasks.count == 1 ? "" : "s") detected")
+                .orynFont(.orynCaption, color: .orynTextSecondary)
+            Spacer()
+            Button {
+                HapticManager.shared.selectionChanged()
+                let all = tasks.allSatisfy(\.isSelected)
+                withAnimation(.orynSpring) {
+                    for i in tasks.indices { tasks[i].isSelected = !all }
+                }
+            } label: {
+                Text(tasks.allSatisfy(\.isSelected) ? "Deselect all" : "Select all")
+                    .orynFont(.orynCaption, color: .orynAccent)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, Spacing.md)
+        .padding(.top, Spacing.sm)
+        .padding(.bottom, Spacing.xs)
+    }
+
+    // MARK: - Task List
+
+    private var taskList: some View {
+        ScrollView {
+            LazyVStack(spacing: Spacing.sm) {
+                ForEach(tasks.indices, id: \.self) { index in
+                    taskRow(at: index)
+                }
+            }
+            .padding(.horizontal, Spacing.md)
+            .padding(.top, Spacing.md)
+            .padding(.bottom, 120)
+        }
     }
 
     // MARK: - Bottom bar
@@ -73,7 +87,7 @@ struct ScanPreviewView: View {
     private var bottomBar: some View {
         VStack(spacing: Spacing.sm) {
             if selectedCount > 0 {
-                Button(action: importSelected) {
+                Button(action: checkAndImport) {
                     HStack(spacing: Spacing.sm) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 18))
@@ -104,7 +118,6 @@ struct ScanPreviewView: View {
     private var successOverlay: some View {
         ZStack {
             Color.orynBackground.opacity(0.92).ignoresSafeArea()
-
             VStack(spacing: Spacing.lg) {
                 ZStack {
                     Circle()
@@ -130,9 +143,35 @@ struct ScanPreviewView: View {
         .transition(.opacity)
     }
 
-    // MARK: - Import action
+    // MARK: - Import logic
 
-    private func importSelected() {
+    private func checkAndImport() {
+        let selected = tasks.filter(\.isSelected)
+        guard !selected.isEmpty else { return }
+
+        // Duplicate detection: check for very similar titles in existing tasks
+        let existingTitles = store.tasks.map { $0.title.lowercased() }
+        let potentialDups = selected.filter { parsed in
+            let lc = parsed.title.lowercased()
+            return existingTitles.contains { existing in
+                // Simple overlap check: titles share ≥ 70% of words
+                let parsedWords   = Set(lc.split(separator: " ").map(String.init))
+                let existingWords = Set(existing.split(separator: " ").map(String.init))
+                guard !parsedWords.isEmpty else { return false }
+                let overlap = parsedWords.intersection(existingWords).count
+                return Double(overlap) / Double(parsedWords.count) >= 0.7
+            }
+        }
+
+        if !potentialDups.isEmpty {
+            duplicateTitles = potentialDups.map(\.title)
+            showDuplicateWarning = true
+        } else {
+            performImport()
+        }
+    }
+
+    private func performImport() {
         let selected = tasks.filter(\.isSelected)
         guard !selected.isEmpty else { return }
 
@@ -150,34 +189,36 @@ struct ScanPreviewView: View {
         }
 
         withAnimation(.orynSmooth) { showSuccess = true }
-
-        // Auto-dismiss after a short celebration
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
             HapticManager.shared.light()
             onDismiss()
         }
     }
 
-    // MARK: - Row helper
+    // MARK: - Row helpers
 
     @ViewBuilder
     private func taskRow(at index: Int) -> some View {
         let task = tasks[index]
         ParsedTaskRow(
             task: binding(for: task.id),
-            appeared: appeared.contains(task.id)
+            appeared: appeared.contains(task.id),
+            onDelete: { deleteTask(at: index) }
         )
         .onAppear {
             let delay = Double(index) * 0.06
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                withAnimation(.orynBounce) {
-                    _ = appeared.insert(task.id)
-                }
+                withAnimation(.orynBounce) { _ = appeared.insert(task.id) }
             }
         }
     }
 
-    // MARK: - Binding helper
+    private func deleteTask(at index: Int) {
+        withAnimation(.orynSpring) {
+            guard tasks.indices.contains(index) else { return }
+            tasks.remove(at: index)
+        }
+    }
 
     private func binding(for id: UUID) -> Binding<ParsedTask> {
         let fallback = ParsedTask(title: "", durationMinutes: 30, priority: .medium)
@@ -197,77 +238,101 @@ struct ScanPreviewView: View {
 private struct ParsedTaskRow: View {
     @Binding var task: ParsedTask
     let appeared: Bool
+    let onDelete: () -> Void
 
     @State private var isEditing = false
     @State private var editTitle = ""
+    @State private var showDetailEditor = false
 
     var body: some View {
         HStack(spacing: Spacing.md) {
-            // Selection circle
-            Button {
-                HapticManager.shared.selectionChanged()
-                withAnimation(.orynSpring) { task.isSelected.toggle() }
-            } label: {
-                ZStack {
-                    Circle()
-                        .strokeBorder(task.isSelected ? Color.orynAccent : Color.orynTextTertiary, lineWidth: 1.5)
-                        .frame(width: 24, height: 24)
-                    if task.isSelected {
-                        Circle()
-                            .fill(Color.orynAccent)
-                            .frame(width: 14, height: 14)
-                            .transition(.scale.combined(with: .opacity))
-                    }
-                }
-            }
-            .buttonStyle(.plain)
+            selectionButton
 
             VStack(alignment: .leading, spacing: Spacing.xs) {
-                if isEditing {
-                    TextField("Task title", text: $editTitle)
-                        .orynFont(.orynHeadline)
-                        .submitLabel(.done)
-                        .onSubmit { commitEdit() }
-                } else {
-                    Text(task.title)
-                        .orynFont(.orynHeadline)
-                        .strikethrough(!task.isSelected, color: .orynTextTertiary)
-                        .foregroundColor(task.isSelected ? .orynTextPrimary : .orynTextSecondary)
-                        .onTapGesture(count: 2) { startEditing() }
-                }
-
-                HStack(spacing: Spacing.sm) {
-                    // Duration
-                    metaChip(icon: "clock", label: durationLabel(task.durationMinutes),
-                             color: .orynTextSecondary)
-
-                    // Priority (only when not medium)
-                    if task.priority != .medium {
-                        metaChip(icon: task.priority.icon,
-                                 label: task.priority.label,
-                                 color: task.priority.color)
-                    }
-
-                    // Deadline label
-                    if let dl = task.deadlineLabel {
-                        metaChip(icon: "calendar", label: dl, color: .orynAccent)
-                    }
-                }
+                titleArea
+                metaRow
             }
 
             Spacer()
+
+            // Edit button for full detail editing
+            Button {
+                HapticManager.shared.light()
+                showDetailEditor = true
+            } label: {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.system(size: 14))
+                    .foregroundColor(.orynTextSecondary)
+            }
+            .buttonStyle(.plain)
         }
         .padding(Spacing.md)
-        .background(
-            RoundedRectangle(cornerRadius: Radius.md)
-                .fill(Color.orynSurface)
-        )
+        .background(RoundedRectangle(cornerRadius: Radius.md).fill(Color.orynSurface))
         .orynCardShadow()
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 20)
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(role: .destructive) { onDelete() } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+        .sheet(isPresented: $showDetailEditor) {
+            ParsedTaskDetailEditor(task: $task)
+        }
     }
 
-    // MARK: - Edit support
+    // MARK: - Sub-components
+
+    private var selectionButton: some View {
+        Button {
+            HapticManager.shared.selectionChanged()
+            withAnimation(.orynSpring) { task.isSelected.toggle() }
+        } label: {
+            ZStack {
+                Circle()
+                    .strokeBorder(task.isSelected ? Color.orynAccent : Color.orynTextTertiary, lineWidth: 1.5)
+                    .frame(width: 24, height: 24)
+                if task.isSelected {
+                    Circle()
+                        .fill(Color.orynAccent)
+                        .frame(width: 14, height: 14)
+                        .transition(.scale.combined(with: .opacity))
+                }
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var titleArea: some View {
+        Group {
+            if isEditing {
+                TextField("Task title", text: $editTitle)
+                    .orynFont(.orynHeadline)
+                    .submitLabel(.done)
+                    .onSubmit { commitEdit() }
+            } else {
+                Text(task.title)
+                    .orynFont(.orynHeadline)
+                    .strikethrough(!task.isSelected, color: .orynTextTertiary)
+                    .foregroundColor(task.isSelected ? .orynTextPrimary : .orynTextSecondary)
+                    .onTapGesture(count: 2) { startEditing() }
+            }
+        }
+    }
+
+    private var metaRow: some View {
+        HStack(spacing: Spacing.sm) {
+            metaChip(icon: "clock", label: durationLabel(task.durationMinutes), color: .orynTextSecondary)
+
+            if task.priority != .medium {
+                metaChip(icon: task.priority.icon, label: task.priority.label, color: task.priority.color)
+            }
+
+            if let dl = task.deadlineLabel {
+                metaChip(icon: "calendar", label: dl, color: .orynAccent)
+            }
+        }
+    }
 
     private func startEditing() {
         editTitle = task.title
@@ -280,19 +345,104 @@ private struct ParsedTaskRow: View {
         withAnimation(.orynSmooth) { isEditing = false }
     }
 
-    // MARK: - Helpers
-
     private func durationLabel(_ minutes: Int) -> String {
         minutes >= 60 ? "\(minutes / 60)h" : "\(minutes)m"
     }
 
     private func metaChip(icon: String, label: String, color: Color) -> some View {
         HStack(spacing: 3) {
-            Image(systemName: icon)
-                .font(.system(size: 10, weight: .medium))
-            Text(label)
-                .orynFont(.orynCaption)
+            Image(systemName: icon).font(.system(size: 10, weight: .medium))
+            Text(label).orynFont(.orynCaption)
         }
         .foregroundColor(color)
+    }
+}
+
+// MARK: - Parsed Task Detail Editor
+
+private struct ParsedTaskDetailEditor: View {
+    @Binding var task: ParsedTask
+    @Environment(\.dismiss) var dismiss
+
+    @State private var title: String
+    @State private var durationMinutes: Int
+    @State private var priority: Priority
+    @State private var deadline: Date
+
+    init(task: Binding<ParsedTask>) {
+        _task            = task
+        _title           = State(initialValue: task.wrappedValue.title)
+        _durationMinutes = State(initialValue: task.wrappedValue.durationMinutes)
+        _priority        = State(initialValue: task.wrappedValue.priority)
+        _deadline        = State(initialValue: task.wrappedValue.deadline
+                                 ?? Calendar.current.date(byAdding: .day, value: 3, to: Date())!)
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: Spacing.lg) {
+                    VStack(alignment: .leading, spacing: Spacing.xs) {
+                        TextField("Task title", text: $title, axis: .vertical)
+                            .orynFont(.orynTitle2)
+                            .lineLimit(1...3)
+                    }
+                    .padding(.top, Spacing.xs)
+
+                    Divider()
+
+                    RowLabel(title: "Deadline", icon: "calendar") {
+                        DatePicker("", selection: $deadline, in: Date()..., displayedComponents: .date)
+                            .labelsHidden()
+                            .accentColor(.orynAccent)
+                    }
+
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: Spacing.sm) {
+                        Text("Duration").orynFont(.orynSubheadline, color: .orynTextSecondary)
+                        DurationPickerView(selected: $durationMinutes)
+                    }
+
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: Spacing.sm) {
+                        Text("Priority").orynFont(.orynSubheadline, color: .orynTextSecondary)
+                        PriorityPickerView(selected: $priority)
+                    }
+
+                    Spacer(minLength: Spacing.xl)
+
+                    Button {
+                        let cleaned = title.trimmingCharacters(in: .whitespaces)
+                        if !cleaned.isEmpty { task.title = cleaned }
+                        task.durationMinutes = durationMinutes
+                        task.priority        = priority
+                        task.deadline        = deadline
+                        dismiss()
+                    } label: {
+                        Text("Apply")
+                            .orynFont(.orynButton, color: .white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, Spacing.md)
+                            .background(RoundedRectangle(cornerRadius: Radius.md).fill(Color.orynAccent))
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(Spacing.md)
+                .padding(.bottom, Spacing.xl)
+            }
+            .background(Color.orynBackground.ignoresSafeArea())
+            .navigationTitle("Edit Task")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                        .foregroundColor(.orynTextSecondary)
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 }

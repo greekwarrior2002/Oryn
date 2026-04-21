@@ -9,7 +9,6 @@ struct TodayView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
-                // Pinned header — never scrolls away, unaffected by list animations
                 header
                     .padding(.top, Spacing.xl)
                     .padding(.horizontal, Spacing.md)
@@ -36,6 +35,11 @@ struct TodayView: View {
                         if !store.todayTasks.isEmpty {
                             contextualActions
                         }
+
+                        // Backlog / inbox section — always shown if non-empty
+                        if !store.backlogTasks.isEmpty {
+                            BacklogSectionView()
+                        }
                     }
                     .padding(.horizontal, Spacing.md)
                     .padding(.bottom, 120)
@@ -43,7 +47,6 @@ struct TodayView: View {
             }
             .background(Color.orynBackground.ignoresSafeArea())
 
-            // Undo toast — floats above tab bar after a task is completed
             if let task = store.undoTask {
                 UndoToast(message: "Completed \"\(task.title)\"") {
                     HapticManager.shared.medium()
@@ -76,9 +79,7 @@ struct TodayView: View {
                     showScanner = true
                 } label: {
                     ZStack {
-                        Circle()
-                            .fill(Color.orynSurface)
-                            .frame(width: 40, height: 40)
+                        Circle().fill(Color.orynSurface).frame(width: 40, height: 40)
                         Image(systemName: "doc.text.viewfinder")
                             .font(.system(size: 18, weight: .medium))
                             .foregroundColor(.orynAccent)
@@ -86,16 +87,13 @@ struct TodayView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Scan tasks")
-                .accessibilityHint("Import tasks from a photo or camera")
 
                 Button {
                     HapticManager.shared.light()
                     showAddTask = true
                 } label: {
                     ZStack {
-                        Circle()
-                            .fill(Color.orynAccent)
-                            .frame(width: 40, height: 40)
+                        Circle().fill(Color.orynAccent).frame(width: 40, height: 40)
                         Image(systemName: "plus")
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(.white)
@@ -103,7 +101,6 @@ struct TodayView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Add task")
-                .accessibilityHint("Opens the new task form")
             }
         }
     }
@@ -112,8 +109,6 @@ struct TodayView: View {
 
     private var taskSection: some View {
         VStack(spacing: Spacing.sm) {
-            // Use id-based animation on the container, not transition on each card.
-            // This avoids conflict with the card's own scale/opacity completion animation.
             ForEach(store.todayTasks) { task in
                 TaskCardView(task: task)
             }
@@ -135,15 +130,11 @@ struct TodayView: View {
                 withAnimation(.orynSmooth) { store.tooBusyToday() }
             } label: {
                 HStack(spacing: Spacing.xs) {
-                    Image(systemName: "arrow.forward.circle")
-                        .font(.system(size: 13))
-                    Text("Too busy today")
-                        .orynFont(.orynButtonSm, color: .orynTextSecondary)
+                    Image(systemName: "arrow.forward.circle").font(.system(size: 13))
+                    Text("Too busy today").orynFont(.orynButtonSm, color: .orynTextSecondary)
                 }
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Too busy today")
-            .accessibilityHint("Moves all remaining tasks to tomorrow or later")
 
             Spacer()
 
@@ -152,17 +143,210 @@ struct TodayView: View {
                 withAnimation(.orynSmooth) { store.doneEarly() }
             } label: {
                 HStack(spacing: Spacing.xs) {
-                    Image(systemName: "bolt.fill")
-                        .font(.system(size: 12))
-                    Text("Done early")
-                        .orynFont(.orynButtonSm, color: .orynTextSecondary)
+                    Image(systemName: "bolt.fill").font(.system(size: 12))
+                    Text("Done early").orynFont(.orynButtonSm, color: .orynTextSecondary)
                 }
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Done early")
-            .accessibilityHint("Pulls upcoming tasks forward to fill today's remaining capacity")
         }
         .padding(.vertical, Spacing.xs)
+    }
+}
+
+// MARK: - Backlog Section
+
+struct BacklogSectionView: View {
+    @EnvironmentObject var store: TaskStore
+    @State private var isExpanded = false
+    @State private var showPromoteSheet: OrynTask? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Spacing.sm) {
+            Button {
+                HapticManager.shared.light()
+                withAnimation(.orynSpring) { isExpanded.toggle() }
+            } label: {
+                HStack(spacing: Spacing.sm) {
+                    Image(systemName: "tray.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(.orynAccent)
+                    Text("Inbox")
+                        .orynFont(.orynHeadline)
+                    Text("\(store.backlogTasks.count)")
+                        .orynFont(.orynCaption, color: .white)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 2)
+                        .background(Capsule().fill(Color.orynAccent))
+                    Spacer()
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 12))
+                        .foregroundColor(.orynTextTertiary)
+                }
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                VStack(spacing: Spacing.xs) {
+                    ForEach(store.backlogTasks) { task in
+                        BacklogTaskRow(task: task, onPlan: { showPromoteSheet = task })
+                    }
+                }
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .padding(Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: Radius.lg)
+                .fill(Color.orynSurface)
+                .orynCardShadow()
+        )
+        .sheet(item: $showPromoteSheet) { task in
+            PromoteBacklogView(task: task)
+                .environmentObject(store)
+        }
+    }
+}
+
+// MARK: - Backlog Task Row
+
+private struct BacklogTaskRow: View {
+    @EnvironmentObject var store: TaskStore
+    let task: OrynTask
+    let onPlan: () -> Void
+
+    var body: some View {
+        HStack(spacing: Spacing.sm) {
+            Text(task.title)
+                .orynFont(.orynSubheadline)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Button {
+                HapticManager.shared.light()
+                onPlan()
+            } label: {
+                Text("Plan")
+                    .orynFont(.orynCaption, color: .orynAccent)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .strokeBorder(Color.orynAccent, lineWidth: 1)
+                    )
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, Spacing.xs)
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(role: .destructive) {
+                store.deleteTask(task)
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+    }
+}
+
+// MARK: - Promote Backlog Sheet
+
+struct PromoteBacklogView: View {
+    @EnvironmentObject var store: TaskStore
+    @Environment(\.dismiss) var dismiss
+    let task: OrynTask
+
+    @State private var title: String
+    @State private var deadline = Calendar.current.date(byAdding: .day, value: 3, to: Date()) ?? Date()
+    @State private var durationMinutes = 30
+    @State private var priority: Priority = .medium
+    @State private var energyLevel: EnergyLevel = .medium
+
+    init(task: OrynTask) {
+        self.task = task
+        _title = State(initialValue: task.title)
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: Spacing.lg) {
+                    VStack(alignment: .leading, spacing: Spacing.xs) {
+                        TextField("Task name", text: $title, axis: .vertical)
+                            .orynFont(.orynTitle2)
+                            .lineLimit(1...3)
+                        Text("Set the details to move this to your schedule.")
+                            .orynFont(.orynCaption, color: .orynTextSecondary)
+                    }
+                    .padding(.top, Spacing.xs)
+
+                    Divider()
+
+                    RowLabel(title: "Deadline", icon: "calendar") {
+                        DatePicker("", selection: $deadline, in: Date()..., displayedComponents: .date)
+                            .labelsHidden()
+                            .accentColor(.orynAccent)
+                    }
+
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: Spacing.sm) {
+                        Text("Duration")
+                            .orynFont(.orynSubheadline, color: .orynTextSecondary)
+                        DurationPickerView(selected: $durationMinutes)
+                    }
+
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: Spacing.sm) {
+                        Text("Priority")
+                            .orynFont(.orynSubheadline, color: .orynTextSecondary)
+                        PriorityPickerView(selected: $priority)
+                    }
+
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: Spacing.sm) {
+                        Text("Energy needed")
+                            .orynFont(.orynSubheadline, color: .orynTextSecondary)
+                        EnergyPickerView(selected: $energyLevel)
+                    }
+
+                    Spacer(minLength: Spacing.xl)
+
+                    Button {
+                        HapticManager.shared.success()
+                        store.promoteFromBacklog(
+                            task,
+                            title: title.trimmingCharacters(in: .whitespaces).isEmpty ? task.title : title,
+                            deadline: deadline,
+                            durationMinutes: durationMinutes,
+                            priority: priority,
+                            energyLevel: energyLevel
+                        )
+                        dismiss()
+                    } label: {
+                        Text("Schedule Task")
+                            .orynFont(.orynButton, color: .white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, Spacing.md)
+                            .background(RoundedRectangle(cornerRadius: Radius.md).fill(Color.orynAccent))
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(Spacing.md)
+                .padding(.bottom, Spacing.xl)
+            }
+            .background(Color.orynBackground.ignoresSafeArea())
+            .navigationTitle("Plan Task")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                        .foregroundColor(.orynTextSecondary)
+                }
+            }
+        }
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
     }
 }
 
@@ -212,19 +396,14 @@ struct UndoToast: View {
                 .orynFont(.orynCaption, color: .white)
                 .lineLimit(1)
                 .truncationMode(.tail)
-
             Spacer()
-
             Button("Undo", action: onUndo)
                 .orynFont(.orynCaption, color: .orynAccent)
                 .fontWeight(.semibold)
         }
         .padding(.horizontal, Spacing.md)
         .padding(.vertical, Spacing.sm + 2)
-        .background(
-            Capsule()
-                .fill(Color.black.opacity(0.82))
-        )
+        .background(Capsule().fill(Color.black.opacity(0.82)))
         .padding(.horizontal, Spacing.lg)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(message)

@@ -11,6 +11,11 @@ struct InsightsView: View {
 
                 statsRow
 
+                // Weekly review always shown once there's data
+                if let review = insightsStore.weeklyReview, review.hasData {
+                    WeeklyReviewCard(review: review)
+                }
+
                 content
             }
             .padding(.horizontal, Spacing.md)
@@ -52,7 +57,6 @@ struct InsightsView: View {
                     aiErrorNote(err)
                 }
             } else {
-                // Has enough records but no patterns surfaced yet — analysing
                 analyzingCard
             }
         } else {
@@ -74,8 +78,7 @@ struct InsightsView: View {
 
     private var aiLoadingCard: some View {
         HStack(spacing: Spacing.md) {
-            ProgressView()
-                .tint(.orynAccent)
+            ProgressView().tint(.orynAccent)
             Text("Analysing your patterns…")
                 .orynFont(.orynSubheadline, color: .orynTextSecondary)
             Spacer()
@@ -94,7 +97,7 @@ struct InsightsView: View {
             .padding(.horizontal, Spacing.xs)
     }
 
-    // MARK: - Analysing state (enough data, no insights fired yet)
+    // MARK: - Analysing state
 
     private var analyzingCard: some View {
         VStack(alignment: .leading, spacing: Spacing.md) {
@@ -106,10 +109,8 @@ struct InsightsView: View {
                 Text("\(insightsStore.totalCompletions) tasks logged")
                     .orynFont(.orynCaption, color: .orynTextSecondary)
             }
-
             Text("Patterns forming")
                 .orynFont(.orynTitle2)
-
             Text("You have enough data, but distinct patterns haven't emerged yet. Complete tasks at different times of day or across multiple days to surface insights.")
                 .orynFont(.orynSubheadline, color: .orynTextSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -122,7 +123,7 @@ struct InsightsView: View {
         )
     }
 
-    // MARK: - Empty State (< minimumCompletions)
+    // MARK: - Empty State
 
     private var emptyState: some View {
         VStack(spacing: Spacing.lg) {
@@ -141,10 +142,8 @@ struct InsightsView: View {
                 Text("\(insightsStore.totalCompletions) / \(InsightsEngine.minimumCompletions)")
                     .orynFont(.orynCaption, color: .orynTextSecondary)
             }
-
             Text("Your insights are forming")
                 .orynFont(.orynTitle2)
-
             Group {
                 if insightsStore.completionsNeeded > 0 {
                     let n = insightsStore.completionsNeeded
@@ -207,8 +206,129 @@ struct InsightsView: View {
         "Best hours for focused work",
         "How sleep affects your output",
         "Task completion streak",
-        "Evening productivity patterns",
+        "Weekly review & slippage report",
+        "Schedule overload warnings",
     ]
+}
+
+// MARK: - Weekly Review Card
+
+struct WeeklyReviewCard: View {
+    let review: WeeklyReviewSummary
+
+    private let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MMM d"
+        return f
+    }()
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Spacing.md) {
+            // Header
+            HStack(spacing: Spacing.sm) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: Radius.sm)
+                        .fill(Color.orynAccent.opacity(0.15))
+                        .frame(width: 38, height: 38)
+                    Image(systemName: "calendar.badge.checkmark")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.orynAccent)
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Weekly Review")
+                        .orynFont(.orynHeadline)
+                    Text("\(dateFormatter.string(from: review.weekStart)) – \(dateFormatter.string(from: review.weekEnd))")
+                        .orynFont(.orynCaption, color: .orynTextSecondary)
+                }
+                Spacer()
+            }
+
+            // Stat row
+            HStack(spacing: Spacing.sm) {
+                reviewStat(
+                    value: "\(review.completedCount)",
+                    label: "Done",
+                    color: .orynSuccess
+                )
+                reviewStat(
+                    value: "\(review.onTimeCount)",
+                    label: "On time",
+                    color: .orynAccent
+                )
+                reviewStat(
+                    value: "\(review.slippedCount)",
+                    label: "Slipped",
+                    color: review.slippedCount > 0 ? .orynReschedule : .orynTextTertiary
+                )
+                if review.completedCount > 0 {
+                    reviewStat(
+                        value: "\(review.onTimeRatePct)%",
+                        label: "On-time rate",
+                        color: rateColor(review.onTimeRatePct)
+                    )
+                }
+            }
+
+            if let label = review.estimationAccuracyLabel {
+                HStack(spacing: Spacing.xs) {
+                    Image(systemName: "target")
+                        .font(.system(size: 12))
+                        .foregroundColor(.orynTextSecondary)
+                    Text("Estimate accuracy: \(label)")
+                        .orynFont(.orynCaption, color: .orynTextSecondary)
+                }
+            }
+
+            // Contextual message
+            if review.completedCount > 0 {
+                Text(weeklyMessage(review))
+                    .orynFont(.orynSubheadline, color: .orynTextSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(Spacing.lg)
+        .background(
+            RoundedRectangle(cornerRadius: Radius.lg)
+                .fill(Color.orynSurface)
+                .orynCardShadow()
+        )
+    }
+
+    private func reviewStat(value: String, label: String, color: Color) -> some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .orynFont(.orynTitle2)
+                .foregroundColor(color)
+            Text(label)
+                .orynFont(.orynCaption, color: .orynTextSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, Spacing.sm)
+        .background(
+            RoundedRectangle(cornerRadius: Radius.sm)
+                .fill(Color.orynSurfaceSecondary)
+        )
+    }
+
+    private func rateColor(_ pct: Int) -> Color {
+        switch pct {
+        case 80...: return .orynSuccess
+        case 60..<80: return .orynAccent
+        default: return .orynReschedule
+        }
+    }
+
+    private func weeklyMessage(_ review: WeeklyReviewSummary) -> String {
+        if review.onTimeRatePct >= 80 {
+            return "Solid week — you delivered on \(review.onTimeRatePct)% of what you planned."
+        } else if review.slippedCount > review.onTimeCount {
+            return "More tasks slipped than landed on time. Consider a lighter daily load next week."
+        } else if review.completedCount >= 5 {
+            return "You completed \(review.completedCount) tasks this week. Keep the momentum going."
+        } else {
+            return "Complete more tasks to build a fuller picture of your weekly rhythm."
+        }
+    }
 }
 
 // MARK: - Insight Card
@@ -222,6 +342,8 @@ struct InsightCard: View {
         case .sleep:       return Color(red: 0.38, green: 0.61, blue: 0.92)
         case .consistency: return .orynSuccess
         case .energy:      return .orynReschedule
+        case .review:      return .orynAccent
+        case .overload:    return Color.orange
         }
     }
 
@@ -298,10 +420,8 @@ private struct InsightStatPill: View {
 
     var body: some View {
         VStack(spacing: 2) {
-            Text(value)
-                .orynFont(.orynTitle2)
-            Text(label)
-                .orynFont(.orynCaption, color: .orynTextSecondary)
+            Text(value).orynFont(.orynTitle2)
+            Text(label).orynFont(.orynCaption, color: .orynTextSecondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, Spacing.md)
