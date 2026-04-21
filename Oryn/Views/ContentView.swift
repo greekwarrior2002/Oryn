@@ -21,17 +21,27 @@ struct ContentView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $selectedTab) {
-                TodayView(showAddTask: $showAddTask, showScanner: $showScanner)
-                    .tag(Tab.today)
+                // LazyTabContent defers initialisation until first selection,
+                // reducing startup work for rarely-visited tabs.
+                LazyTabContent(isSelected: selectedTab == .today) {
+                    TodayView(showAddTask: $showAddTask, showScanner: $showScanner)
+                }
+                .tag(Tab.today)
 
-                WeekView(showAddTask: $showAddTask)
-                    .tag(Tab.week)
+                LazyTabContent(isSelected: selectedTab == .week) {
+                    WeekView(showAddTask: $showAddTask)
+                }
+                .tag(Tab.week)
 
-                InsightsView()
-                    .tag(Tab.insights)
+                LazyTabContent(isSelected: selectedTab == .insights) {
+                    InsightsView()
+                }
+                .tag(Tab.insights)
 
-                SettingsView()
-                    .tag(Tab.settings)
+                LazyTabContent(isSelected: selectedTab == .settings) {
+                    SettingsView()
+                }
+                .tag(Tab.settings)
             }
 
             CustomTabBar(selected: $selectedTab, showAddTask: $showAddTask)
@@ -50,6 +60,7 @@ struct ContentView: View {
             set: { shown in
                 if !shown {
                     hasSeenOnboarding = true
+                    // Explicit cap update after onboarding completes.
                     store.updateDailyCap(Int(dailyCapHours * 60))
                 }
             }
@@ -59,9 +70,9 @@ struct ContentView: View {
                 set: { shown in if !shown { hasSeenOnboarding = true } }
             ))
         }
-        .onChange(of: dailyCapHours) { _, hours in
-            store.updateDailyCap(Int(hours * 60))
-        }
+        // Removed: onChange(of: dailyCapHours) — SettingsView owns the slider and
+        // already debounces + calls store.updateDailyCap. Having both fired on every
+        // AppStorage write defeated the debounce and triggered redistribute twice.
     }
 }
 

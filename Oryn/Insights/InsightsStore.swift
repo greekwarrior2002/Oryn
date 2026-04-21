@@ -86,6 +86,12 @@ final class InsightsStore: ObservableObject {
     }
 
     func refreshInsights() {
-        insights = InsightsEngine.generateInsights(from: records)
+        // Snapshot the model objects on main before handing to the detached task —
+        // ProductivityRecord (@Model) must not be accessed from a non-owning actor.
+        let snapshots = records.map(ProductivitySnapshot.init)
+        Task.detached(priority: .utility) { [weak self] in
+            let generated = InsightsEngine.generateInsights(from: snapshots)
+            await MainActor.run { self?.insights = generated }
+        }
     }
 }

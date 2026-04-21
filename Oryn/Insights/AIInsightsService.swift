@@ -27,10 +27,10 @@ protocol AIInsightsService {
 
 final class ClaudeInsightsService: AIInsightsService {
 
-    // ⚠️  Replace with your actual Anthropic API key before shipping.
-    // For development, you can also set the ANTHROPIC_API_KEY environment variable.
+    // Key is injected via Oryn/Config/Secrets.xcconfig (gitignored) into Info.plist.
+    // See Secrets.xcconfig.example for setup instructions.
     private static let apiKey: String = {
-        ProcessInfo.processInfo.environment["ANTHROPIC_API_KEY"] ?? ""
+        Bundle.main.object(forInfoDictionaryKey: "ANTHROPIC_API_KEY") as? String ?? ""
     }()
 
     private static let endpoint = URL(string: "https://api.anthropic.com/v1/messages")!
