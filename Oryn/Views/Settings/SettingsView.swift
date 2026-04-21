@@ -6,6 +6,8 @@ struct SettingsView: View {
     @AppStorage("dailyCapHours") private var dailyCapHours: Double = 4.0
     @AppStorage("workStartHour") private var workStartHour: Double = 9.0
     @AppStorage("workEndHour") private var workEndHour: Double = 18.0
+    // Debounce task so redistribute only runs after the slider settles
+    @State private var sliderDebounce: Task<Void, Never>? = nil
 
     var body: some View {
         NavigationStack {
@@ -24,8 +26,13 @@ struct SettingsView: View {
                         Slider(value: $dailyCapHours, in: 1...10, step: 0.5)
                             .accentColor(.orynAccent)
                             .onChange(of: dailyCapHours) { _, hours in
-                                let minutes = Int(hours * 60)
-                                store.updateDailyCap(minutes)
+                                // Debounce: wait 0.4 s after the last tick before redistributing
+                                sliderDebounce?.cancel()
+                                sliderDebounce = Task { @MainActor in
+                                    try? await Task.sleep(for: .seconds(0.4))
+                                    guard !Task.isCancelled else { return }
+                                    store.updateDailyCap(Int(hours * 60))
+                                }
                             }
 
                         Text("How many hours Oryn will schedule per day.")
@@ -105,7 +112,7 @@ struct SettingsView: View {
                                 .orynFont(.orynSubheadline, color: .orynTextSecondary)
                         }
                         Button("Refresh Health Data") {
-                            Task { await healthKit.fetchHealthData() }
+                            Task { await healthKit.fetchHealthData(ignoreThrottle: true) }
                         }
                         .foregroundColor(.orynAccent)
                     }
@@ -139,6 +146,10 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
+            // Push content above the floating custom tab bar
+            .safeAreaInset(edge: .bottom) {
+                Color.clear.frame(height: 90)
+            }
         }
     }
 

@@ -7,33 +7,38 @@ struct TodayView: View {
     @Binding var showScanner: Bool
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.lg) {
-                header
-                    .padding(.top, Spacing.xl)
+        VStack(spacing: 0) {
+            // Pinned header — never scrolls away, unaffected by list animations
+            header
+                .padding(.top, Spacing.xl)
+                .padding(.horizontal, Spacing.md)
+                .padding(.bottom, Spacing.md)
 
-                ReadinessCardView()
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: Spacing.lg) {
+                    ReadinessCardView()
 
-                if store.todayTotalMinutes > 0 {
-                    DayProgressView(
-                        progress: store.todayProgress,
-                        completedMinutes: store.todayCompletedMinutes,
-                        totalMinutes: store.todayTotalMinutes
-                    )
+                    if store.todayTotalMinutes > 0 {
+                        DayProgressView(
+                            progress: store.todayProgress,
+                            completedMinutes: store.todayCompletedMinutes,
+                            totalMinutes: store.todayTotalMinutes
+                        )
+                    }
+
+                    if store.todayTasks.isEmpty && store.completedTodayTasks.isEmpty {
+                        EmptyTodayView(showAddTask: $showAddTask)
+                    } else {
+                        taskSection
+                    }
+
+                    if !store.todayTasks.isEmpty {
+                        contextualActions
+                    }
                 }
-
-                if store.todayTasks.isEmpty && store.completedTodayTasks.isEmpty {
-                    EmptyTodayView(showAddTask: $showAddTask)
-                } else {
-                    taskSection
-                }
-
-                if !store.todayTasks.isEmpty {
-                    contextualActions
-                }
+                .padding(.horizontal, Spacing.md)
+                .padding(.bottom, 120)
             }
-            .padding(.horizontal, Spacing.md)
-            .padding(.bottom, 120) // clearance for custom tab bar
         }
         .background(Color.orynBackground.ignoresSafeArea())
     }
