@@ -17,6 +17,7 @@ struct SettingsView: View {
         NavigationStack {
             List {
                 schedulingSection
+                integrationsSection
                 notificationsSection
                 healthSection
                 aboutSection
@@ -26,6 +27,29 @@ struct SettingsView: View {
             .safeAreaInset(edge: .bottom) {
                 Color.clear.frame(height: 90)
             }
+        }
+    }
+
+    // MARK: - Integrations & Suggestions
+
+    private var integrationsSection: some View {
+        Section {
+            NavigationLink {
+                IntegrationsView()
+                    .environmentObject(store)
+            } label: {
+                Label("Integrations", systemImage: "link")
+            }
+            NavigationLink {
+                SuggestionsView()
+                    .environmentObject(store)
+            } label: {
+                Label("Suggestions", systemImage: "sparkles")
+            }
+        } header: {
+            Text("Smart features")
+        } footer: {
+            Text("Connect Outlook or Google Calendar to see suggested tasks based on your schedule.")
         }
     }
 

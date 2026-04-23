@@ -45,6 +45,78 @@ final class TaskStore: ObservableObject {
             .sorted { $0.createdAt > $1.createdAt }
     }
 
+    // MARK: - Smart Views (inbox-first architecture)
+    //
+    // Each "view" below is a derived filter over the single underlying task list.
+    // Nothing is duplicated — a task appears in exactly the views that its
+    // metadata naturally fits into. This keeps routing centralised and
+    // predictable: changing a task's deadline changes which views it shows up in,
+    // without any side-effects elsewhere.
+
+    /// Inbox — unscheduled captures. Equivalent to `backlogTasks`, exposed under
+    /// the more product-accurate name so views can read cleanly.
+    var inboxTasks: [OrynTask] {
+        backlogTasks
+    }
+
+    /// Today — tasks scheduled for today OR tasks with a deadline of today that
+    /// have not yet been placed on another day. Sorted by dueTime (if set), then
+    /// priority.
+    var todaySmartTasks: [OrynTask] {
+        let cal = Calendar.current
+        return tasks
+            .filter { task in
+                guard !task.isCompleted, !task.isInBacklog else { return false }
+                if let scheduled = task.scheduledDate, cal.isDateInToday(scheduled) { return true }
+                return cal.isDateInToday(task.deadline)
+            }
+            .sorted(by: smartDayOrder)
+    }
+
+    /// This Week — tasks with a scheduledDate or deadline falling in the current week.
+    var thisWeekTasks: [OrynTask] {
+        let cal = Calendar.current
+        guard let interval = cal.dateInterval(of: .weekOfYear, for: Date()) else { return [] }
+        return tasks
+            .filter { task in
+                guard !task.isCompleted, !task.isInBacklog else { return false }
+                if let s = task.scheduledDate, interval.contains(s) { return true }
+                return interval.contains(task.deadline)
+            }
+            .sorted(by: smartDayOrder)
+    }
+
+    /// Scheduled — everything that has a placed date, active (not completed, not inbox).
+    var scheduledTasks: [OrynTask] {
+        tasks
+            .filter { !$0.isCompleted && !$0.isInBacklog && $0.scheduledDate != nil }
+            .sorted { ($0.scheduledDate ?? .distantFuture) < ($1.scheduledDate ?? .distantFuture) }
+    }
+
+    /// Completed — everything done, newest first.
+    var completedTasks: [OrynTask] {
+        tasks
+            .filter { $0.isCompleted }
+            .sorted { ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast) }
+    }
+
+    private func smartDayOrder(_ a: OrynTask, _ b: OrynTask) -> Bool {
+        // Order by time-of-day first if either has one, then priority, then title.
+        if let at = a.dueTime, let bt = b.dueTime {
+            let cal = Calendar.current
+            let ha = cal.dateComponents([.hour, .minute], from: at)
+            let hb = cal.dateComponents([.hour, .minute], from: bt)
+            let aMin = (ha.hour ?? 0) * 60 + (ha.minute ?? 0)
+            let bMin = (hb.hour ?? 0) * 60 + (hb.minute ?? 0)
+            if aMin != bMin { return aMin < bMin }
+        } else if a.dueTime != nil { return true }
+        else if b.dueTime != nil { return false }
+        if a.priority.sortWeight != b.priority.sortWeight {
+            return a.priority.sortWeight > b.priority.sortWeight
+        }
+        return a.createdAt < b.createdAt
+    }
+
     /// Next 14 days, only days that have tasks (plus today always included).
     /// Backlog tasks are excluded from the week view.
     var scheduledDays: [ScheduleDay] {
@@ -128,6 +200,86 @@ final class TaskStore: ObservableObject {
         tasks.append(task)
         save()
         fetchTasks()
+    }
+
+    /// Inbox-first quick add: parse the raw title and route the task to the right
+    /// place automatically. This is the primary entry point for the minimal
+    /// capture sheet.
+    ///
+    /// - If the parser detects a date/time, the task is created with that date
+    ///   and auto-scheduled through the normal pipeline.
+    /// - If no date/time is detected, the task goes straight to the Inbox.
+    /// - Priority keywords override the default priority when present.
+    @discardableResult
+    func quickAdd(rawTitle: String, source: TaskSource = .manual) -> OrynTask? {
+        let trimmed = rawTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+
+        let parsed = NLPTaskParser.parse(trimmed)
+        let finalTitle = parsed.cleanedTitle.isEmpty ? trimmed : parsed.cleanedTitle
+        let priority = parsed.priority ?? .medium
+        let energy = EnergyLevel.inferred(from: finalTitle)
+
+        if parsed.shouldSchedule, let date = parsed.dueDate {
+            let task = OrynTask(
+                title: finalTitle,
+                deadline: date,
+                durationMinutes: 30,
+                priority: priority,
+                energyLevel: energy,
+                isBacklog: false,
+                dueTime: parsed.dueTime,
+                inferredFromTitle: parsed.hasAnyDetection,
+                source: source
+            )
+            context.insert(task)
+            tasks.append(task)
+            SchedulerEngine.redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
+            save()
+            fetchTasks()
+            refreshNotifications()
+            return task
+        } else {
+            let task = OrynTask(
+                title: finalTitle,
+                deadline: Calendar.current.date(byAdding: .day, value: 30, to: Date()) ?? Date(),
+                durationMinutes: 30,
+                priority: priority,
+                energyLevel: energy,
+                isBacklog: true,
+                inferredFromTitle: parsed.hasAnyDetection,
+                source: source
+            )
+            context.insert(task)
+            tasks.append(task)
+            save()
+            fetchTasks()
+            return task
+        }
+    }
+
+    /// Move an inbox task onto a specific day. Used by quick reschedule and the
+    /// suggestion review flow.
+    func scheduleInboxTask(_ task: OrynTask, on date: Date, time: Date? = nil) {
+        task.isInBacklog = false
+        task.deadline = date
+        task.dueTime = time
+        SchedulerEngine.redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
+        save()
+        fetchTasks()
+        refreshNotifications()
+    }
+
+    /// Move a scheduled task back to the inbox (unschedule).
+    func moveToInbox(_ task: OrynTask) {
+        task.isInBacklog = true
+        task.scheduledDate = nil
+        task.dueTime = nil
+        task.schedulePinnedDate = nil
+        SchedulerEngine.redistribute(tasks: tasks, dailyCapMinutes: dailyCapMinutes)
+        save()
+        fetchTasks()
+        refreshNotifications()
     }
 
     /// Converts a backlog task into a fully scheduled task.

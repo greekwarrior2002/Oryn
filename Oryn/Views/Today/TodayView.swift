@@ -36,9 +36,11 @@ struct TodayView: View {
                             contextualActions
                         }
 
-                        // Backlog / inbox section — always shown if non-empty
-                        if !store.backlogTasks.isEmpty {
-                            BacklogSectionView()
+                        // A compact hint pointing to the Inbox tab when there
+                        // are unscheduled captures. The full inbox lives on its
+                        // own tab — we don't duplicate it here.
+                        if !store.inboxTasks.isEmpty {
+                            InboxHintRow(count: store.inboxTasks.count)
                         }
                     }
                     .padding(.horizontal, Spacing.md)
@@ -381,6 +383,31 @@ private struct CompletedSection: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Inbox hint (lightweight pointer to the Inbox tab)
+
+private struct InboxHintRow: View {
+    let count: Int
+
+    var body: some View {
+        HStack(spacing: Spacing.sm) {
+            Image(systemName: "tray.fill")
+                .foregroundColor(.orynAccent)
+                .font(.system(size: 14))
+            Text("\(count) in Inbox")
+                .orynFont(.orynSubheadline)
+            Spacer()
+            Text("Plan later")
+                .orynFont(.orynCaption, color: .orynTextTertiary)
+        }
+        .padding(.horizontal, Spacing.md)
+        .padding(.vertical, Spacing.sm)
+        .background(
+            RoundedRectangle(cornerRadius: Radius.md)
+                .fill(Color.orynAccent.opacity(0.08))
+        )
     }
 }
 

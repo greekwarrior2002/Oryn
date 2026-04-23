@@ -4,6 +4,10 @@ struct AddTaskView: View {
     @EnvironmentObject var store: TaskStore
     @Environment(\.dismiss) var dismiss
 
+    /// Optional prefill passed through from the Quick-Add sheet so users don't
+    /// lose what they typed when opening "More options".
+    var prefilledTitle: String? = nil
+
     @State private var title = ""
     @State private var isBacklog = false
     @State private var deadline = Calendar.current.date(byAdding: .day, value: 3, to: Date()) ?? Date()
@@ -93,6 +97,11 @@ struct AddTaskView: View {
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .onAppear {
+            if let prefill = prefilledTitle, title.isEmpty {
+                title = prefill
+                // Seed energy inference from prefilled text.
+                energyLevel = EnergyLevel.inferred(from: prefill)
+            }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { titleFocused = true }
         }
     }

@@ -63,6 +63,19 @@
 		CCCCCCCCCCCCCCCCCCCCCC41 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB41 /* NotificationManager.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCC42 /* RecurrencePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB42 /* RecurrencePickerView.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCC43 /* SchedulingControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB43 /* SchedulingControlsView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC44 /* NLPTaskParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB44 /* NLPTaskParser.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC45 /* HighlightedTaskField.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB45 /* HighlightedTaskField.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC46 /* IntegrationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB46 /* IntegrationProvider.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC47 /* IntegrationTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB47 /* IntegrationTokenStore.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC48 /* OutlookService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB48 /* OutlookService.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC49 /* GoogleCalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB49 /* GoogleCalendarService.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC4A /* TaskSuggestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB4A /* TaskSuggestion.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC4B /* SuggestionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB4B /* SuggestionEngine.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC4C /* SuggestionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB4C /* SuggestionStore.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC4D /* InboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB4D /* InboxView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC4E /* SuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB4E /* SuggestionsView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC4F /* IntegrationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB4F /* IntegrationsView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCC50 /* QuickAddTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB50 /* QuickAddTaskView.swift */; };
 		AA11111111111111111111A1 /* SchedulerEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11111111111111111111A1 /* SchedulerEngineTests.swift */; };
 		AA11111111111111111111A3 /* RecurringTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11111111111111111111A3 /* RecurringTaskTests.swift */; };
 /* End PBXBuildFile section */
@@ -127,6 +140,19 @@
 		BBBBBBBBBBBBBBBBBBBBBB41 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBB42 /* RecurrencePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrencePickerView.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBB43 /* SchedulingControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulingControlsView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB44 /* NLPTaskParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NLPTaskParser.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB45 /* HighlightedTaskField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedTaskField.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB46 /* IntegrationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationProvider.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB47 /* IntegrationTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationTokenStore.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB48 /* OutlookService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlookService.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB49 /* GoogleCalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarService.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB4A /* TaskSuggestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSuggestion.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB4B /* SuggestionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionEngine.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB4C /* SuggestionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionStore.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB4D /* InboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB4E /* SuggestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB4F /* IntegrationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationsView.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBB50 /* QuickAddTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickAddTaskView.swift; sourceTree = "<group>"; };
 		BB11111111111111111111A1 /* SchedulerEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerEngineTests.swift; sourceTree = "<group>"; };
 		BB11111111111111111111A3 /* RecurringTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurringTaskTests.swift; sourceTree = "<group>"; };
 		BB11111111111111111111A2 /* OrynTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrynTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -189,6 +215,9 @@
 				DDDDDDDDDDDDDDDDDDDDDD05 /* Scheduling */,
 				DDDDDDDDDDDDDDDDDDDDDD06 /* Store */,
 				DDDDDDDDDDDDDDDDDDDDDD11 /* Insights */,
+				DDDDDDDDDDDDDDDDDDDDDD16 /* Parsing */,
+				DDDDDDDDDDDDDDDDDDDDDD17 /* Integrations */,
+				DDDDDDDDDDDDDDDDDDDDDD18 /* Suggestions */,
 				DDDDDDDDDDDDDDDDDDDDDD13 /* Intents */,
 				DDDDDDDDDDDDDDDDDDDDDD14 /* Scanner */,
 				DDDDDDDDDDDDDDDDDDDDDD20 /* Notifications */,
@@ -269,6 +298,9 @@
 				DDDDDDDDDDDDDDDDDDDDDD0B /* Today */,
 				DDDDDDDDDDDDDDDDDDDDDD0C /* AddTask */,
 				DDDDDDDDDDDDDDDDDDDDDD0D /* Week */,
+				DDDDDDDDDDDDDDDDDDDDDD19 /* Inbox */,
+				DDDDDDDDDDDDDDDDDDDDDD1A /* Suggestions */,
+				DDDDDDDDDDDDDDDDDDDDDD1B /* Integrations */,
 				DDDDDDDDDDDDDDDDDDDDDD0E /* Settings */,
 				DDDDDDDDDDDDDDDDDDDDDD12 /* Insights */,
 				DDDDDDDDDDDDDDDDDDDDDD15 /* Scanner */,
@@ -291,6 +323,7 @@
 		DDDDDDDDDDDDDDDDDDDDDD0C /* AddTask */ = {
 			isa = PBXGroup;
 			children = (
+				BBBBBBBBBBBBBBBBBBBBBB50 /* QuickAddTaskView.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB13 /* AddTaskView.swift */,
 				BBBBBBBBBBBBBBBBBBBBBBF3 /* EditTaskView.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB14 /* DurationPickerView.swift */,
@@ -300,6 +333,60 @@
 				BBBBBBBBBBBBBBBBBBBBBB43 /* SchedulingControlsView.swift */,
 			);
 			path = AddTask;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD16 /* Parsing */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB44 /* NLPTaskParser.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB45 /* HighlightedTaskField.swift */,
+			);
+			path = Parsing;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD17 /* Integrations */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB46 /* IntegrationProvider.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB47 /* IntegrationTokenStore.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB48 /* OutlookService.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB49 /* GoogleCalendarService.swift */,
+			);
+			path = Integrations;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD18 /* Suggestions */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB4A /* TaskSuggestion.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB4B /* SuggestionEngine.swift */,
+				BBBBBBBBBBBBBBBBBBBBBB4C /* SuggestionStore.swift */,
+			);
+			path = Suggestions;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD19 /* Inbox */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB4D /* InboxView.swift */,
+			);
+			path = Inbox;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD1A /* Suggestions */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB4E /* SuggestionsView.swift */,
+			);
+			path = Suggestions;
+			sourceTree = "<group>";
+		};
+		DDDDDDDDDDDDDDDDDDDDDD1B /* Integrations */ = {
+			isa = PBXGroup;
+			children = (
+				BBBBBBBBBBBBBBBBBBBBBB4F /* IntegrationsView.swift */,
+			);
+			path = Integrations;
 			sourceTree = "<group>";
 		};
 		DDDDDDDDDDDDDDDDDDDDDD0D /* Week */ = {
@@ -539,6 +626,19 @@
 				CCCCCCCCCCCCCCCCCCCCCC41 /* NotificationManager.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCC42 /* RecurrencePickerView.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCC43 /* SchedulingControlsView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC44 /* NLPTaskParser.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC45 /* HighlightedTaskField.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC46 /* IntegrationProvider.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC47 /* IntegrationTokenStore.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC48 /* OutlookService.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC49 /* GoogleCalendarService.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC4A /* TaskSuggestion.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC4B /* SuggestionEngine.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC4C /* SuggestionStore.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC4D /* InboxView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC4E /* SuggestionsView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC4F /* IntegrationsView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCC50 /* QuickAddTaskView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -22,11 +22,18 @@ enum OrynSchemaV4: VersionedSchema {
     static var models: [any PersistentModel.Type] { [OrynTask.self, ProductivityRecord.self] }
 }
 
+// V5 adds Inbox-first parser metadata: dueTime, inferredFromTitle, source, externalRef.
+// All new fields are optional so lightweight migration leaves existing rows as nil.
+enum OrynSchemaV5: VersionedSchema {
+    static var versionIdentifier = Schema.Version(1, 4, 0)
+    static var models: [any PersistentModel.Type] { [OrynTask.self, ProductivityRecord.self] }
+}
+
 enum OrynMigrationPlan: SchemaMigrationPlan {
     static var schemas: [any VersionedSchema.Type] {
-        [OrynSchemaV1.self, OrynSchemaV2.self, OrynSchemaV3.self, OrynSchemaV4.self]
+        [OrynSchemaV1.self, OrynSchemaV2.self, OrynSchemaV3.self, OrynSchemaV4.self, OrynSchemaV5.self]
     }
-    static var stages: [MigrationStage] { [v1ToV2, v2ToV3, v3ToV4] }
+    static var stages: [MigrationStage] { [v1ToV2, v2ToV3, v3ToV4, v4ToV5] }
 
     static let v1ToV2 = MigrationStage.lightweight(
         fromVersion: OrynSchemaV1.self,
@@ -41,5 +48,10 @@ enum OrynMigrationPlan: SchemaMigrationPlan {
     static let v3ToV4 = MigrationStage.lightweight(
         fromVersion: OrynSchemaV3.self,
         toVersion: OrynSchemaV4.self
+    )
+
+    static let v4ToV5 = MigrationStage.lightweight(
+        fromVersion: OrynSchemaV4.self,
+        toVersion: OrynSchemaV5.self
     )
 }

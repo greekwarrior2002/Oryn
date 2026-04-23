@@ -10,7 +10,7 @@ struct ContentView: View {
     @AppStorage("dailyCapHours") private var dailyCapHours: Double = 4.0
 
     enum Tab: Int, Hashable {
-        case today, week, insights, settings
+        case today, week, inbox, insights, settings
     }
 
     init() {
@@ -33,6 +33,11 @@ struct ContentView: View {
                 }
                 .tag(Tab.week)
 
+                LazyTabContent(isSelected: selectedTab == .inbox) {
+                    InboxView(showAddTask: $showAddTask)
+                }
+                .tag(Tab.inbox)
+
                 LazyTabContent(isSelected: selectedTab == .insights) {
                     InsightsView()
                 }
@@ -48,7 +53,8 @@ struct ContentView: View {
         }
         .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $showAddTask) {
-            AddTaskView()
+            // Inbox-first quick capture is the default entry point.
+            QuickAddTaskView()
                 .environmentObject(store)
         }
         .sheet(isPresented: $showScanner) {
@@ -70,9 +76,6 @@ struct ContentView: View {
                 set: { shown in if !shown { hasSeenOnboarding = true } }
             ))
         }
-        // Removed: onChange(of: dailyCapHours) — SettingsView owns the slider and
-        // already debounces + calls store.updateDailyCap. Having both fired on every
-        // AppStorage write defeated the debounce and triggered redistribute twice.
     }
 }
 
@@ -81,14 +84,15 @@ struct ContentView: View {
 private struct CustomTabBar: View {
     @Binding var selected: ContentView.Tab
     @Binding var showAddTask: Bool
+    @EnvironmentObject var store: TaskStore
 
     var body: some View {
         HStack(spacing: 0) {
-            tabItem(.today,    icon: "sun.max.fill",   label: "Today")
-            tabItem(.week,     icon: "calendar",        label: "Week")
+            tabItem(.today,    icon: "sun.max.fill",       label: "Today")
+            tabItem(.week,     icon: "calendar",            label: "Week")
             addButton
-            tabItem(.insights, icon: "chart.bar.fill",  label: "Insights")
-            tabItem(.settings, icon: "gearshape.fill",  label: "Settings")
+            inboxTabItem
+            tabItem(.settings, icon: "gearshape.fill",      label: "Settings")
         }
         .padding(.horizontal, Spacing.lg)
         .padding(.top, Spacing.sm)
@@ -114,6 +118,40 @@ private struct CustomTabBar: View {
                     .scaleEffect(isSelected ? 1.08 : 1.0)
                     .animation(.orynSpring, value: isSelected)
                 Text(label)
+                    .orynFont(.orynCaption, color: isSelected ? .orynAccent : .orynTextTertiary)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.plain)
+    }
+
+    /// Inbox tab shows a count badge for captured tasks.
+    private var inboxTabItem: some View {
+        let isSelected = selected == .inbox
+        let count = store.inboxTasks.count
+        return Button {
+            HapticManager.shared.light()
+            withAnimation(.orynSpring) { selected = .inbox }
+        } label: {
+            VStack(spacing: 4) {
+                ZStack(alignment: .topTrailing) {
+                    Image(systemName: "tray.fill")
+                        .font(.system(size: 20, weight: isSelected ? .semibold : .regular))
+                        .foregroundColor(isSelected ? .orynAccent : .orynTextTertiary)
+                        .scaleEffect(isSelected ? 1.08 : 1.0)
+                        .animation(.orynSpring, value: isSelected)
+                    if count > 0 {
+                        Text("\(count)")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 1)
+                            .background(Capsule().fill(Color.orynAccent))
+                            .offset(x: 10, y: -6)
+                            .transition(.scale.combined(with: .opacity))
+                    }
+                }
+                Text("Inbox")
                     .orynFont(.orynCaption, color: isSelected ? .orynAccent : .orynTextTertiary)
             }
             .frame(maxWidth: .infinity)

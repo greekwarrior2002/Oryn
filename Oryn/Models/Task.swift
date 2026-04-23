@@ -23,7 +23,8 @@ final class OrynTask {
     var parentRecurrenceId: UUID?
 
     // MARK: - Backlog / Inbox (schema V4)
-    /// Stored as Bool? so lightweight migration can leave existing rows as nil (= false)
+    /// Stored as Bool? so lightweight migration can leave existing rows as nil (= false).
+    /// A task with isBacklog == true is an Inbox item — not placed on the calendar.
     var isBacklog: Bool?
 
     // MARK: - Manual Scheduling (schema V4)
@@ -33,6 +34,22 @@ final class OrynTask {
     var scheduleNotBeforeDate: Date?
     /// When true, the task is skipped entirely during redistribution
     var isScheduleLocked: Bool?
+
+    // MARK: - Inbox-first & parser metadata (schema V5)
+    /// Wall-clock time component when the user (or parser) specified a specific time of day.
+    /// Stored as a full Date whose hour/minute components are the intended time.
+    var dueTime: Date?
+
+    /// Whether the deadline/dueTime/priority were inferred from the title text.
+    /// Used to show a subtle "inferred" hint and for analytics.
+    var inferredFromTitleRaw: Bool?
+
+    /// Origin of the task — "manual", "inbox", "outlook", "gcal", "suggestion", "scan", "siri".
+    /// Defaults to "manual" when nil (pre-V5 rows).
+    var sourceRaw: String?
+
+    /// External identifier used by integrations to avoid duplicating imported items.
+    var externalRef: String?
 
     // MARK: - Computed: existing
 
@@ -108,6 +125,35 @@ final class OrynTask {
         set { isScheduleLocked = newValue ? true : nil }
     }
 
+    // MARK: - Computed: V5 helpers
+
+    var inferredFromTitle: Bool {
+        get { inferredFromTitleRaw ?? false }
+        set { inferredFromTitleRaw = newValue ? true : nil }
+    }
+
+    var source: TaskSource {
+        get { TaskSource(rawValue: sourceRaw ?? "") ?? .manual }
+        set { sourceRaw = newValue == .manual ? nil : newValue.rawValue }
+    }
+
+    /// Formatted time string for display (e.g. "7:00 PM"), or nil if no specific time.
+    var dueTimeLabel: String? {
+        guard let t = dueTime else { return nil }
+        let fmt = DateFormatter()
+        fmt.dateFormat = "h:mm a"
+        return fmt.string(from: t)
+    }
+
+    /// The canonical "when" date combining deadline day + dueTime if present.
+    /// Useful for sorting today tasks chronologically.
+    var deadlineWithTime: Date {
+        guard let t = dueTime else { return deadline }
+        let cal = Calendar.current
+        let hm = cal.dateComponents([.hour, .minute], from: t)
+        return cal.date(bySettingHour: hm.hour ?? 0, minute: hm.minute ?? 0, second: 0, of: deadline) ?? deadline
+    }
+
     // MARK: - Init
 
     init(
@@ -116,7 +162,11 @@ final class OrynTask {
         durationMinutes: Int,
         priority: Priority,
         energyLevel: EnergyLevel = .medium,
-        isBacklog: Bool = false
+        isBacklog: Bool = false,
+        dueTime: Date? = nil,
+        inferredFromTitle: Bool = false,
+        source: TaskSource = .manual,
+        externalRef: String? = nil
     ) {
         self.id = UUID()
         self.title = title
@@ -127,5 +177,45 @@ final class OrynTask {
         self.isCompleted = false
         self.createdAt = Date()
         self.isBacklog = isBacklog ? true : nil
+        self.dueTime = dueTime
+        self.inferredFromTitleRaw = inferredFromTitle ? true : nil
+        self.sourceRaw = source == .manual ? nil : source.rawValue
+        self.externalRef = externalRef
+    }
+}
+
+// MARK: - TaskSource
+
+enum TaskSource: String, Codable, CaseIterable {
+    case manual      = "manual"
+    case inbox       = "inbox"
+    case outlook     = "outlook"
+    case gcal        = "gcal"
+    case suggestion  = "suggestion"
+    case scan        = "scan"
+    case siri        = "siri"
+
+    var label: String {
+        switch self {
+        case .manual:     return "Added"
+        case .inbox:      return "Inbox"
+        case .outlook:    return "Outlook"
+        case .gcal:       return "Google Calendar"
+        case .suggestion: return "Suggested"
+        case .scan:       return "Scanned"
+        case .siri:       return "Siri"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .manual:     return "plus.circle"
+        case .inbox:      return "tray.fill"
+        case .outlook:    return "envelope.fill"
+        case .gcal:       return "calendar.circle.fill"
+        case .suggestion: return "sparkles"
+        case .scan:       return "doc.text.viewfinder"
+        case .siri:       return "mic.fill"
+        }
     }
 }
