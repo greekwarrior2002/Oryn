@@ -41,14 +41,14 @@ final class OutlookService: NSObject, IntegrationProvider, ObservableObject {
     }
 
     // MARK: Configuration
-    // Replace with your Azure AD application (client) ID. Consider loading
-    // from Info.plist via a Secrets.xcconfig entry so the secret doesn't hit
-    // source control.
-    private var clientID: String {
-        (Bundle.main.object(forInfoDictionaryKey: "OUTLOOK_CLIENT_ID") as? String) ?? ""
-    }
-    private let redirectURI = "msauth.com.oryn://auth"
-    private let scopes = ["Calendars.Read", "Mail.Read", "User.Read", "offline_access"]
+    //
+    // Client ID, redirect URI, and scopes are centralised in `AppConfig` so
+    // every integration pulls from the same Secrets.xcconfig → Info.plist
+    // pipeline. Leave the key blank to keep the rest of the app working; the
+    // `connect()` call will surface a clear "notConfigured" error.
+    private var clientID: String { AppConfig.outlookClientID }
+    private let redirectURI = AppConfig.outlookRedirectURI
+    private let scopes = AppConfig.outlookScopes
 
     private override init() { super.init() }
 

@@ -76,6 +76,9 @@
 		CCCCCCCCCCCCCCCCCCCCCC4E /* SuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB4E /* SuggestionsView.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCC4F /* IntegrationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB4F /* IntegrationsView.swift */; };
 		CCCCCCCCCCCCCCCCCCCCCC50 /* QuickAddTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBB50 /* QuickAddTaskView.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCCF6 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBBF6 /* AppConfig.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCCF7 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBBF7 /* WeatherService.swift */; };
+		CCCCCCCCCCCCCCCCCCCCCCF8 /* WeeklyPlannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBBBBBBBBBBBBBBBBBBBBF8 /* WeeklyPlannerService.swift */; };
 		AA11111111111111111111A1 /* SchedulerEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11111111111111111111A1 /* SchedulerEngineTests.swift */; };
 		AA11111111111111111111A3 /* RecurringTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB11111111111111111111A3 /* RecurringTaskTests.swift */; };
 /* End PBXBuildFile section */
@@ -133,6 +136,10 @@
 		BBBBBBBBBBBBBBBBBBBBBB32 /* ImageScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageScannerView.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBB33 /* ScanPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanPreviewView.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBBF0 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBBF5 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBBF6 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBBF7 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
+		BBBBBBBBBBBBBBBBBBBBBBF8 /* WeeklyPlannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyPlannerService.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBBF1 /* AIInsightsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIInsightsService.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBBF2 /* LazyTabContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyTabContent.swift; sourceTree = "<group>"; };
 		BBBBBBBBBBBBBBBBBBBBBBF3 /* EditTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTaskView.swift; sourceTree = "<group>"; };
@@ -250,6 +257,7 @@
 			isa = PBXGroup;
 			children = (
 				BBBBBBBBBBBBBBBBBBBBBB05 /* SchedulerEngine.swift */,
+				BBBBBBBBBBBBBBBBBBBBBBF8 /* WeeklyPlannerService.swift */,
 			);
 			path = Scheduling;
 			sourceTree = "<group>";
@@ -351,6 +359,7 @@
 				BBBBBBBBBBBBBBBBBBBBBB47 /* IntegrationTokenStore.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB48 /* OutlookService.swift */,
 				BBBBBBBBBBBBBBBBBBBBBB49 /* GoogleCalendarService.swift */,
+				BBBBBBBBBBBBBBBBBBBBBBF7 /* WeatherService.swift */,
 			);
 			path = Integrations;
 			sourceTree = "<group>";
@@ -437,7 +446,9 @@
 		DDDDDDDDDDDDDDDDDDDDDDF0 /* Config */ = {
 			isa = PBXGroup;
 			children = (
+				BBBBBBBBBBBBBBBBBBBBBBF5 /* Config.xcconfig */,
 				BBBBBBBBBBBBBBBBBBBBBBF0 /* Secrets.xcconfig */,
+				BBBBBBBBBBBBBBBBBBBBBBF6 /* AppConfig.swift */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -639,6 +650,9 @@
 				CCCCCCCCCCCCCCCCCCCCCC4E /* SuggestionsView.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCC4F /* IntegrationsView.swift in Sources */,
 				CCCCCCCCCCCCCCCCCCCCCC50 /* QuickAddTaskView.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCCF6 /* AppConfig.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCCF7 /* WeatherService.swift in Sources */,
+				CCCCCCCCCCCCCCCCCCCCCCF8 /* WeeklyPlannerService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -791,6 +805,7 @@
 		};
 		EEEEEEEEEEEEEEEEEEEEEE0A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BBBBBBBBBBBBBBBBBBBBBBF5 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -806,7 +821,11 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Oryn reads your sleep and step data to adjust your daily schedule to match your energy level.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Oryn uses your camera to scan handwritten or printed task lists.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Oryn accesses your photo library to import images of handwritten task lists.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Oryn uses your location to show local weather and tailor suggestions (indoor vs outdoor) to today's conditions.";
 				INFOPLIST_KEY_ANTHROPIC_API_KEY = "$(ANTHROPIC_API_KEY)";
+				INFOPLIST_KEY_OUTLOOK_CLIENT_ID = "$(OUTLOOK_CLIENT_ID)";
+				INFOPLIST_KEY_GCAL_CLIENT_ID = "$(GCAL_CLIENT_ID)";
+				INFOPLIST_KEY_OPENWEATHER_API_KEY = "$(OPENWEATHER_API_KEY)";
 				CODE_SIGN_ENTITLEMENTS = Oryn/Oryn.entitlements;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -823,6 +842,7 @@
 		};
 		EEEEEEEEEEEEEEEEEEEEEE0B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BBBBBBBBBBBBBBBBBBBBBBF5 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -838,7 +858,11 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Oryn reads your sleep and step data to adjust your daily schedule to match your energy level.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Oryn uses your camera to scan handwritten or printed task lists.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Oryn accesses your photo library to import images of handwritten task lists.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Oryn uses your location to show local weather and tailor suggestions (indoor vs outdoor) to today's conditions.";
 				INFOPLIST_KEY_ANTHROPIC_API_KEY = "$(ANTHROPIC_API_KEY)";
+				INFOPLIST_KEY_OUTLOOK_CLIENT_ID = "$(OUTLOOK_CLIENT_ID)";
+				INFOPLIST_KEY_GCAL_CLIENT_ID = "$(GCAL_CLIENT_ID)";
+				INFOPLIST_KEY_OPENWEATHER_API_KEY = "$(OPENWEATHER_API_KEY)";
 				CODE_SIGN_ENTITLEMENTS = Oryn/Oryn.entitlements;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

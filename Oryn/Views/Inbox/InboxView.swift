@@ -6,38 +6,56 @@ import SwiftUI
 ///   • directly from Quick Add when no date keyword was detected, or
 ///   • manually via "Move to Inbox" from another view.
 ///
-/// Swipe actions let the user schedule an inbox task to Today/Tomorrow or
-/// delete it. Tapping a card opens the detailed editor.
+/// ### Layout stability
+///
+/// The previous version put the header *inside* the ScrollView with a single
+/// `.animation(value:)` on the whole VStack. When a task was added the spring
+/// animation re-laid-out both the header and the list, which combined with
+/// the scroll view's content sizing to push items half-off-screen.
+///
+/// The fix: the header stays outside the scroll view so it never re-lays out;
+/// animations are scoped to the list rows only via `.transition` on each card.
 struct InboxView: View {
     @EnvironmentObject var store: TaskStore
     @Binding var showAddTask: Bool
     @State private var promoteTask: OrynTask? = nil
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.lg) {
-                header
-                    .padding(.horizontal, Spacing.md)
-                    .padding(.top, Spacing.xl)
+        VStack(alignment: .leading, spacing: 0) {
+            header
+                .padding(.horizontal, Spacing.md)
+                .padding(.top, Spacing.xl)
+                .padding(.bottom, Spacing.md)
 
-                if store.inboxTasks.isEmpty {
+            if store.inboxTasks.isEmpty {
+                ScrollView {
                     InboxEmptyState(showAddTask: $showAddTask)
                         .padding(.top, Spacing.xxl)
-                } else {
-                    VStack(spacing: Spacing.sm) {
+                        .padding(.horizontal, Spacing.md)
+                        .padding(.bottom, 120)
+                }
+                .transition(.opacity)
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: Spacing.sm) {
                         ForEach(store.inboxTasks) { task in
                             InboxTaskRow(
                                 task: task,
                                 onSchedule: { promoteTask = task }
                             )
+                            .transition(.asymmetric(
+                                insertion: .move(edge: .top).combined(with: .opacity),
+                                removal: .opacity
+                            ))
                         }
                     }
                     .padding(.horizontal, Spacing.md)
+                    .padding(.bottom, 120)
                     .animation(.orynSpring, value: store.inboxTasks.map(\.id))
                 }
             }
-            .padding(.bottom, 120)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color.orynBackground.ignoresSafeArea())
         .sheet(item: $promoteTask) { task in
             PromoteBacklogView(task: task)
@@ -56,8 +74,23 @@ struct InboxView: View {
                 if !store.inboxTasks.isEmpty {
                     Text("\(store.inboxTasks.count)")
                         .orynFont(.orynTitle2, color: .orynTextTertiary)
+                        .contentTransition(.numericText())
                 }
                 Spacer()
+                if !store.inboxTasks.isEmpty {
+                    Button {
+                        HapticManager.shared.light()
+                        showAddTask = true
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 36, height: 36)
+                            .background(Circle().fill(Color.orynAccent))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Capture a thought")
+                }
             }
             Text("Quick captures. No pressure — plan them when you're ready.")
                 .orynFont(.orynSubheadline, color: .orynTextSecondary)
@@ -209,6 +242,5 @@ private struct InboxEmptyState: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, Spacing.md)
     }
 }

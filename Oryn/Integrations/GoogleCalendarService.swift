@@ -25,10 +25,8 @@ final class GoogleCalendarService: NSObject, IntegrationProvider, ObservableObje
 
     @Published private(set) var connectionState: OutlookService.ConnectionState = .disconnected
 
-    private var clientID: String {
-        (Bundle.main.object(forInfoDictionaryKey: "GCAL_CLIENT_ID") as? String) ?? ""
-    }
-    private let scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
+    private var clientID: String { AppConfig.googleCalendarClientID }
+    private let scopes = AppConfig.googleCalScopes
 
     private override init() { super.init() }
 

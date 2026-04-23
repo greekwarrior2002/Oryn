@@ -2,36 +2,56 @@ import SwiftUI
 
 struct InsightsView: View {
     @EnvironmentObject var insightsStore: InsightsStore
+    @State private var hasRequestedInitialAI = false
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.lg) {
-                header
-                    .padding(.top, Spacing.xl)
+        VStack(alignment: .leading, spacing: 0) {
+            header
+                .padding(.horizontal, Spacing.md)
+                .padding(.top, Spacing.xl)
+                .padding(.bottom, Spacing.md)
 
-                statsRow
+            ScrollView {
+                VStack(alignment: .leading, spacing: Spacing.lg) {
+                    statsRow
 
-                // Weekly review always shown once there's data
-                if let review = insightsStore.weeklyReview, review.hasData {
-                    WeeklyReviewCard(review: review)
+                    if let review = insightsStore.weeklyReview, review.hasData {
+                        WeeklyReviewCard(review: review)
+                    }
+
+                    content
                 }
-
-                content
+                .padding(.horizontal, Spacing.md)
+                .padding(.bottom, 120)
             }
-            .padding(.horizontal, Spacing.md)
-            .padding(.bottom, 120)
+            .refreshable {
+                await insightsStore.refreshAIInsights()
+            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color.orynBackground.ignoresSafeArea())
+        .onAppear { triggerInitialAIIfNeeded() }
     }
 
     // MARK: - Header
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            Text("Insights")
-                .orynFont(.orynLargeTitle)
-            Text("Your productivity patterns")
-                .orynFont(.orynSubheadline, color: .orynTextSecondary)
+        HStack(alignment: .firstTextBaseline) {
+            VStack(alignment: .leading, spacing: Spacing.xs) {
+                Text("INSIGHTS")
+                    .orynFont(.orynCaption, color: .orynTextSecondary)
+                    .tracking(1.5)
+                Text("Patterns")
+                    .orynFont(.orynLargeTitle)
+                Text("Your productivity patterns, on your own data.")
+                    .orynFont(.orynSubheadline, color: .orynTextSecondary)
+            }
+            Spacer()
+            if insightsStore.isGeneratingAI {
+                ProgressView()
+                    .tint(.orynAccent)
+                    .padding(.trailing, Spacing.xs)
+            }
         }
     }
 
@@ -49,13 +69,13 @@ struct InsightsView: View {
     @ViewBuilder
     private var content: some View {
         if insightsStore.hasEnoughData {
-            if insightsStore.isGeneratingAI {
-                aiLoadingCard
-            } else if !insightsStore.insights.isEmpty {
+            if !insightsStore.insights.isEmpty {
                 insightCards
                 if let err = insightsStore.aiError {
                     aiErrorNote(err)
                 }
+            } else if insightsStore.isGeneratingAI {
+                aiLoadingCard
             } else {
                 analyzingCard
             }
@@ -129,6 +149,9 @@ struct InsightsView: View {
         VStack(spacing: Spacing.lg) {
             progressCard
             previewCard
+            if !AppConfig.isAnthropicConfigured {
+                aiUnavailableNotice
+            }
         }
     }
 
@@ -202,6 +225,22 @@ struct InsightsView: View {
         )
     }
 
+    private var aiUnavailableNotice: some View {
+        HStack(alignment: .top, spacing: Spacing.sm) {
+            Image(systemName: "info.circle")
+                .font(.system(size: 12))
+                .foregroundColor(.orynTextTertiary)
+            Text("AI summaries aren't configured. Local, on-device analysis still works — just add an Anthropic key in Secrets.xcconfig for natural-language insights.")
+                .orynFont(.orynCaption, color: .orynTextTertiary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: Radius.sm)
+                .fill(Color.orynSurfaceSecondary)
+        )
+    }
+
     private let previewHints = [
         "Best hours for focused work",
         "How sleep affects your output",
@@ -209,6 +248,21 @@ struct InsightsView: View {
         "Weekly review & slippage report",
         "Schedule overload warnings",
     ]
+
+    // MARK: - Private
+
+    /// Triggers a one-off AI refresh the first time the Insights tab becomes
+    /// visible if the store has enough data but hasn't generated AI-backed
+    /// summaries yet. Without this, users who already had data before adding a
+    /// key would never see AI insights until the next milestone completion.
+    private func triggerInitialAIIfNeeded() {
+        guard !hasRequestedInitialAI else { return }
+        hasRequestedInitialAI = true
+        guard AppConfig.isAnthropicConfigured,
+              insightsStore.hasEnoughData,
+              !insightsStore.isGeneratingAI else { return }
+        Task { await insightsStore.refreshAIInsights() }
+    }
 }
 
 // MARK: - Weekly Review Card

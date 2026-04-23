@@ -1,0 +1,20 @@
+// Config.xcconfig — committed, always present.
+//
+// This file provides safe default (empty) values for every integration key so
+// the project builds cleanly without a Secrets.xcconfig. Real keys live in
+// Oryn/Config/Secrets.xcconfig (gitignored) — see Secrets.xcconfig.example.
+//
+// The optional `#include?` directive is a no-op when Secrets.xcconfig is
+// missing, so developers can build immediately after cloning.
+
+// ──────────────────────────────────────────────────────────────
+// Integration keys (empty by default — overridden by Secrets.xcconfig)
+// ──────────────────────────────────────────────────────────────
+ANTHROPIC_API_KEY  =
+OUTLOOK_CLIENT_ID  =
+GCAL_CLIENT_ID     =
+OPENWEATHER_API_KEY =
+
+// Pull in the developer's personal secrets if present. Leading double-slash
+// inside the path is required by the xcconfig parser when using `?`.
+#include? "Secrets.xcconfig"

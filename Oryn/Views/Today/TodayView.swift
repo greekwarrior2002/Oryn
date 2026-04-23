@@ -3,6 +3,7 @@ import SwiftUI
 struct TodayView: View {
     @EnvironmentObject var store: TaskStore
     @EnvironmentObject var healthKit: HealthKitManager
+    @StateObject private var weather = WeatherService.shared
     @Binding var showAddTask: Bool
     @Binding var showScanner: Bool
 
@@ -17,6 +18,12 @@ struct TodayView: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: Spacing.lg) {
                         ReadinessCardView()
+
+                        WeatherStripView(
+                            snapshot: weather.snapshot,
+                            suggestions: weather.suggestions(forTasks: store.todayTasks),
+                            status: weather.status
+                        )
 
                         if store.todayTotalMinutes > 0 {
                             DayProgressView(
@@ -60,6 +67,9 @@ struct TodayView: View {
             }
         }
         .animation(.orynSpring, value: store.undoTask?.id)
+        .task {
+            await weather.refreshIfNeeded()
+        }
     }
 
     // MARK: - Header
@@ -113,13 +123,17 @@ struct TodayView: View {
         VStack(spacing: Spacing.sm) {
             ForEach(store.todayTasks) { task in
                 TaskCardView(task: task)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .top).combined(with: .opacity),
+                        removal: .opacity
+                    ))
             }
-            .animation(.orynSpring, value: store.todayTasks.map(\.id))
 
             if !store.completedTodayTasks.isEmpty {
                 CompletedSection(tasks: store.completedTodayTasks)
             }
         }
+        .animation(.orynSpring, value: store.todayTasks.map(\.id))
     }
 
     // MARK: - Contextual Actions
@@ -408,6 +422,81 @@ private struct InboxHintRow: View {
             RoundedRectangle(cornerRadius: Radius.md)
                 .fill(Color.orynAccent.opacity(0.08))
         )
+    }
+}
+
+// MARK: - Weather strip
+//
+// A one-line card when weather is available, with optional contextual
+// suggestions underneath. Hidden entirely when weather isn't configured.
+struct WeatherStripView: View {
+    let snapshot: WeatherSnapshot?
+    let suggestions: [WeatherSuggestion]
+    let status: WeatherService.Status
+
+    var body: some View {
+        if let snap = snapshot {
+            VStack(alignment: .leading, spacing: Spacing.sm) {
+                HStack(spacing: Spacing.md) {
+                    Image(systemName: snap.symbol)
+                        .font(.system(size: 24, weight: .medium))
+                        .foregroundStyle(.tint)
+                        .symbolRenderingMode(.multicolor)
+                        .frame(width: 32)
+
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(snap.headline)
+                            .orynFont(.orynSubheadline)
+                        if Int(snap.feelsLikeC.rounded()) != Int(snap.temperatureC.rounded()) {
+                            let feels = Measurement(value: snap.feelsLikeC, unit: UnitTemperature.celsius)
+                            Text("Feels like \(Self.temperatureFormatter.string(from: feels))")
+                                .orynFont(.orynCaption, color: .orynTextTertiary)
+                        }
+                    }
+                    Spacer()
+                }
+                if !suggestions.isEmpty {
+                    ForEach(suggestions) { sug in
+                        HStack(alignment: .top, spacing: Spacing.sm) {
+                            Image(systemName: sug.icon)
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(tint(for: sug.tone))
+                                .frame(width: 14, alignment: .leading)
+                            Text(sug.message)
+                                .orynFont(.orynCaption, color: .orynTextSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+            }
+            .padding(Spacing.md)
+            .background(
+                RoundedRectangle(cornerRadius: Radius.md)
+                    .fill(Color.orynSurface)
+            )
+        } else if case .unavailable = status {
+            // Keep silent — avoids an ugly "weather unavailable" banner in the
+            // default build. The Settings / Integrations screens surface the
+            // status when the user is looking for it.
+            EmptyView()
+        } else {
+            EmptyView()
+        }
+    }
+
+    private static let temperatureFormatter: MeasurementFormatter = {
+        let f = MeasurementFormatter()
+        f.unitStyle = .short
+        f.numberFormatter.maximumFractionDigits = 0
+        return f
+    }()
+
+    private func tint(for tone: WeatherSuggestion.Tone) -> Color {
+        switch tone {
+        case .helpful:  return .orynAccent
+        case .warning:  return .orange
+        case .positive: return .orynSuccess
+        }
     }
 }
 

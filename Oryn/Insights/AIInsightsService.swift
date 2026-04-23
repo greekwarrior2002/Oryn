@@ -14,16 +14,13 @@ protocol AIInsightsService {
 
 final class ClaudeInsightsService: AIInsightsService {
 
-    // Key is injected via Oryn/Config/Secrets.xcconfig (gitignored) into Info.plist.
+    // Key is injected via Oryn/Config/Secrets.xcconfig (gitignored) into Info.plist,
+    // and surfaced through AppConfig so every integration reads from the same place.
     // See Secrets.xcconfig.example for setup instructions.
-    private static let apiKey: String = {
-        Bundle.main.object(forInfoDictionaryKey: "ANTHROPIC_API_KEY") as? String ?? ""
-    }()
-
     private static let endpoint = URL(string: "https://api.anthropic.com/v1/messages")!
     private static let model = "claude-haiku-4-5-20251001"
 
-    var isConfigured: Bool { !Self.apiKey.isEmpty }
+    var isConfigured: Bool { AppConfig.isAnthropicConfigured }
 
     func generateInsights(from summary: ProductivitySummary) async throws -> [Insight] {
         guard isConfigured else { throw AIInsightsError.notConfigured }
@@ -38,7 +35,7 @@ final class ClaudeInsightsService: AIInsightsService {
         var request = URLRequest(url: Self.endpoint)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "content-type")
-        request.setValue(Self.apiKey, forHTTPHeaderField: "x-api-key")
+        request.setValue(AppConfig.anthropicAPIKey, forHTTPHeaderField: "x-api-key")
         request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
         request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
         request.timeoutInterval = 15

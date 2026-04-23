@@ -88,13 +88,14 @@ private struct CustomTabBar: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            tabItem(.today,    icon: "sun.max.fill",       label: "Today")
-            tabItem(.week,     icon: "calendar",            label: "Week")
+            tabItem(.today,    icon: "sun.max.fill",               label: "Today")
+            tabItem(.week,     icon: "calendar",                   label: "Week")
             addButton
             inboxTabItem
-            tabItem(.settings, icon: "gearshape.fill",      label: "Settings")
+            tabItem(.insights, icon: "sparkles",                   label: "Insights")
+            tabItem(.settings, icon: "gearshape.fill",             label: "Settings")
         }
-        .padding(.horizontal, Spacing.lg)
+        .padding(.horizontal, Spacing.md)
         .padding(.top, Spacing.sm)
         .padding(.bottom, Spacing.md)
         .background(
@@ -113,12 +114,15 @@ private struct CustomTabBar: View {
         } label: {
             VStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 20, weight: isSelected ? .semibold : .regular))
+                    .font(.system(size: 19, weight: isSelected ? .semibold : .regular))
                     .foregroundColor(isSelected ? .orynAccent : .orynTextTertiary)
-                    .scaleEffect(isSelected ? 1.08 : 1.0)
+                    .scaleEffect(isSelected ? 1.06 : 1.0)
                     .animation(.orynSpring, value: isSelected)
                 Text(label)
-                    .orynFont(.orynCaption, color: isSelected ? .orynAccent : .orynTextTertiary)
+                    .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
+                    .foregroundColor(isSelected ? .orynAccent : .orynTextTertiary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
             }
             .frame(maxWidth: .infinity)
         }
@@ -136,9 +140,9 @@ private struct CustomTabBar: View {
             VStack(spacing: 4) {
                 ZStack(alignment: .topTrailing) {
                     Image(systemName: "tray.fill")
-                        .font(.system(size: 20, weight: isSelected ? .semibold : .regular))
+                        .font(.system(size: 19, weight: isSelected ? .semibold : .regular))
                         .foregroundColor(isSelected ? .orynAccent : .orynTextTertiary)
-                        .scaleEffect(isSelected ? 1.08 : 1.0)
+                        .scaleEffect(isSelected ? 1.06 : 1.0)
                         .animation(.orynSpring, value: isSelected)
                     if count > 0 {
                         Text("\(count)")
@@ -152,7 +156,8 @@ private struct CustomTabBar: View {
                     }
                 }
                 Text("Inbox")
-                    .orynFont(.orynCaption, color: isSelected ? .orynAccent : .orynTextTertiary)
+                    .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
+                    .foregroundColor(isSelected ? .orynAccent : .orynTextTertiary)
             }
             .frame(maxWidth: .infinity)
         }
@@ -167,15 +172,16 @@ private struct CustomTabBar: View {
             ZStack {
                 Circle()
                     .fill(Color.orynAccent)
-                    .frame(width: 50, height: 50)
+                    .frame(width: 48, height: 48)
                     .shadow(color: Color.orynAccent.opacity(0.35), radius: 10, x: 0, y: 4)
                 Image(systemName: "plus")
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(.white)
             }
-            .offset(y: -14)
+            .offset(y: -12)
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
+        .accessibilityLabel("Capture a task")
     }
 }
